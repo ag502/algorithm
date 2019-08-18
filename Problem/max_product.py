@@ -1,6 +1,6 @@
 class MaxProduct:
     def max_product(self, left_cards, right_cards):
-        self.max = 0
+        self.max = -1
         for i in left_cards:
             for j in right_cards:
                 if self.max < i * j:
