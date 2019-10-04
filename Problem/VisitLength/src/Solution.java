@@ -1,10 +1,28 @@
 import java.util.ArrayList;
 
 public class Solution {
-    private ArrayList<int [][]> locations = new ArrayList<>();
-    private int[] location = new int[2];
+    private ArrayList<Point []> locations = new ArrayList<>();
 
-    private int[] move(int x, int y, String dir) {
+    class Point {
+        private int x = 0;
+        private int y = 0;
+
+        Point (int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        private int getX() {return x; }
+        private int getY() {return y; }
+        private void setX(int x) {this.x = x; }
+        private void setY(int y) {this.y = y; }
+    }
+
+    private Point move(Point p, String dir) {
+        Point temp = new Point(p.getX(), p.getY());
+        int x = temp.getX();
+        int y = temp.getY();
+
         switch (dir) {
             case "U":
                 y += 1;
@@ -21,62 +39,47 @@ public class Solution {
             default:
                 break;
         }
-        location[0] = x;
-        location[1] = y;
-        return location;
+        temp.setX(x);
+        temp.setY(y);
+
+        return temp;
     }
 
-    private boolean isSameArray(int[] arr1, int[] arr2) {
-        if (arr1.length != arr2.length) {
-            return false;
-        }
-        for (int i = 0; i < arr1.length; i++) {
-            if (arr1[i] != arr2[i]) {
-                return false;
-            }
-        }
-        return true;
+    private boolean isSamePoint(Point p1, Point p2) {
+        return p1.getX() == p2.getX() && p1.getY() == p2.getY();
     }
 
     public int solution(String dirs) {
         String[] directions = dirs.split("");
-        int x, y;
-        int[] currentLocation = {0, 0};
+        Point currentPosition = new Point(0, 0);
 
-        for (int i = 0; i < directions.length; i++) {
-            int[] nextLocation = move(currentLocation[0], currentLocation[1], directions[i]);
-            int tempX = nextLocation[0];
-            int tempY = nextLocation[1];
-            if (tempX > 5 || tempX < -5 || tempY > 5 || tempY < -5) {
+        for(int i = 0; i < directions.length; i++) {
+            Point nextPosition = move(currentPosition, directions[i]);
+            int nextX = nextPosition.getX();
+            int nextY = nextPosition.getY();
+
+            if (nextX < -5 || nextX > 5 || nextY < -5 || nextY > 5) {
                 continue;
-            } else {
-                x = tempX;
-                y = tempY;
-                int j;
-                for (j = 0; j < locations.size(); j++) {
-                    if (isSameArray(locations.get(j)[0], currentLocation) && isSameArray(locations.get(j)[1], nextLocation) ||
-                        isSameArray(locations.get(j)[0], nextLocation) && isSameArray(locations.get(j)[1], currentLocation)) {
-                        break;
-                    }
-                }
-                int[] movedLocation = {x, y};
-                if (j >= locations.size()) {
-                    int[] [] movedLocations = {currentLocation, movedLocation};
-                    locations.add(movedLocations);
-                }
-                currentLocation = movedLocation;
             }
-        }
 
-        for(int[][] a: locations) {
-            System.out.print("[");
-            for(int k = 0; k < a.length; k++) {
-                for(int z = 0; z < a[k].length; z++) {
-                    System.out.print(a[k][z]);
-                    System.out.print(",");
+            nextPosition.setX(nextX);
+            nextPosition.setY(nextY);
+
+            int j;
+            for(j = 0; j < locations.size(); j++) {
+                if((isSamePoint(currentPosition, locations.get(j)[0]) && isSamePoint(nextPosition, locations.get(j)[1])) ||
+                        (isSamePoint(currentPosition, locations.get(j)[1]) && isSamePoint(nextPosition, locations.get(j)[0]))) {
+//                    System.out.println("RUN");
+                    break;
                 }
             }
-            System.out.print("]");
+            if (j >= locations.size()) {
+                Point[] moved = new Point[2];
+                moved[0] = currentPosition;
+                moved[1] = nextPosition;
+                locations.add(moved);
+            }
+            currentPosition = nextPosition;
         }
         return locations.size();
     }
