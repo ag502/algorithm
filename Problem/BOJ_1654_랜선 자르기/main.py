@@ -2,22 +2,24 @@ from sys import stdin
 
 
 def main():
-    n, k = list(map(int, stdin.readline().split()))
+    k, n = list(map(int, stdin.readline().split()))
+    length_of_cables = [int(stdin.readline()) for _ in range(k)]
 
-    length_of_cables = []
-    for _ in range(0, n):
-        cable = int(stdin.readline())
-        length_of_cables.append(cable)
+    start, end = 1, max(length_of_cables)
 
-    max_length = sum(length_of_cables) // k
+    while start <= end:
+        mid = (start + end) // 2
+        lines = 0
 
-    for length in range(max_length, 0, -1):
-        num_of_cable = list(map(lambda x: x // length, length_of_cables))
+        for cable in length_of_cables:
+            lines += cable // mid
 
-        if sum(num_of_cable) == k:
-            print(length)
-            break
+        if lines >= n:
+            start = mid + 1
+        elif lines < n:
+            end = mid - 1
 
+    print(end)
 
 if __name__ == "__main__":
     main()
