@@ -1,35 +1,25 @@
 from sys import stdin
 
-
 def main():
     n = int(stdin.readline())
-    dice_number = list(map(int, stdin.readline().split()))
-    dice_number.sort()
-
-    total_sum = 0
+    dice_num = list(map(int, stdin.readline().split()))
 
     if n == 1:
-        total_sum = sum(dice_number[:5])
+        print(sum(sorted(dice_num)[0:5]))
     else:
-        plain = n ** 2
-        three_plain = 4
-        one_plain = (n - 2) ** 2
-        two_plain = plain - three_plain - one_plain
+        three_min_num = [min(dice_num[0], dice_num[5]),
+                         min(dice_num[1], dice_num[4]),
+                         min(dice_num[2], dice_num[3])]
+        three_min_num.sort()
 
-        front_back = (dice_number[0] * 4
-                      + dice_number[0] * two_plain
-                      + dice_number[0] * one_plain) * 2
-        right_left = (dice_number[1] * 4
-                      + dice_number[1] * two_plain // 2 + dice_number[0] * two_plain // 2
-                      + dice_number[0] * one_plain) * 2
-        top = (dice_number[2] * 4
-               + dice_number[1] * two_plain // 2 + dice_number[1] * two_plain // 2
-               + dice_number[0] * one_plain)
+        num_of_one = (n - 2) ** 2 + ((n - 2) * (n - 1) * 4)
+        num_of_two = 4 * (n - 2) +  4 * (n - 1)
+        num_of_three = 4
 
-        total_sum = front_back + right_left + top
-
-    print(total_sum)
-
+        print(three_min_num[0] * num_of_one
+              + (three_min_num[0] + three_min_num[1]) * num_of_two
+              + (three_min_num[0] + three_min_num[1] + three_min_num[2]) * num_of_three
+              )
 
 if __name__ == "__main__":
     main()
