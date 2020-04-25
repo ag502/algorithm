@@ -21,5 +21,6 @@ def main():
               + (three_min_num[0] + three_min_num[1] + three_min_num[2]) * num_of_three
               )
 
+
 if __name__ == "__main__":
     main()
