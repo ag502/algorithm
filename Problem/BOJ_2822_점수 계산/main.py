@@ -18,5 +18,6 @@ def main():
     print(sum_of_score)
     print(included_problem.strip())
 
+
 if __name__ == '__main__':
     main()
