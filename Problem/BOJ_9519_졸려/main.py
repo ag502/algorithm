@@ -19,21 +19,15 @@ def rotate(sequence):
         right -= 1
     return rotated_sequence
 
-def is_same_string(seq1, seq2):
-    for char1, char2 in zip(seq1, seq2):
-        if char1 != char2:
-            return False
-    return True
-
 def main():
     n = int(stdin.readline())
-    input_string = stdin.readline().rstrip()
+    input_string = list(stdin.readline().rstrip())
     current_string_sequence = input_string
 
     cycle = 1
     while True:
         rotated_sequence = rotate(current_string_sequence)
-        if is_same_string(input_string, rotated_sequence):
+        if input_string == rotated_sequence:
             break
         current_string_sequence = rotated_sequence
         cycle += 1
