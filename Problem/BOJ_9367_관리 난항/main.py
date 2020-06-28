@@ -33,4 +33,3 @@ def main():
         elif event_type == 'a':
             if spy_status[name] == 'p':
                 spy_status[name] = 'a'
-                for 
