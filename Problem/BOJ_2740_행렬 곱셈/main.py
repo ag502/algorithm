@@ -4,13 +4,12 @@ def matrix_multiply(matrix_a, matrix_b):
     answer = []
     for a_row in matrix_a:
         row = []
-        for i in range(len(matrix_b[0])):
+        for b_col in zip(*matrix_b):
             temp = 0
-            for idx, num in enumerate(a_row):
-                temp += a_row[idx] * matrix_b[idx][i]
+            for a_num, b_num in zip(a_row, b_col):
+                temp += a_num * b_num
             row.append(temp)
         answer.append(row)
-
     return answer
 
 
