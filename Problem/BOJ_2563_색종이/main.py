@@ -1,20 +1,30 @@
 from sys import stdin
 
-def overlap_area(pos1, pos2):
-    overlap_x = min(pos1[0], pos2[0]) + 10 - max(pos1[0], pos2[0])
-    overlap_y = min(pos1[1], pos2[1]) + 10 - max(pos1[1], pos2[1])
-
-    return 0 if overlap_x * overlap_y < 0 else overlap_x * overlap_y
+def attach_paper(white_paper, coordinate):
+    col, row = coordinate
+    # print(col, row)
+    for i in range(row, row + 10):
+        for j in range(col, col + 10):
+            white_paper[i][j] = 1
 
 def main():
-    n = int(stdin.readline())
-    position_list = [tuple(map(int,stdin.readline().split())) for _ in range(n)]
+    white_paper = [[0] * 101 for _ in range(101)]
+    num_of_paper = int(stdin.readline())
+    coord_list = []
+    for _ in range(num_of_paper):
+        coord = tuple(map(int, stdin.readline().split()))
+        coord_list.append(coord)
 
-    overlapping_area = 0
-    for i in range(n - 1):
-        for j in range(i + 1, n):
-            overlapping_area += overlap_area(position_list[i], position_list[j])
-    print(100 * n - overlapping_area)
+    for coordinate in coord_list:
+        attach_paper(white_paper, coordinate)
+
+    # print(white_paper)
+
+    sum_of_area = 0
+    for width in white_paper:
+        sum_of_area += width.count(1)
+    print(sum_of_area)
 
 if __name__ == '__main__':
     main()
+
