@@ -26,4 +26,3 @@ def solution(scoville, K):
             update_scoville(scoville)
             answer += 1
 
-            
