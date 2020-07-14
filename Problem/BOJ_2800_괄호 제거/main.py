@@ -16,7 +16,7 @@ def process_exp(expression):
             parenthesis_position.append(parenthesis_pair)
         else:
             num_of_char += 1
-        original_exp += char
+            original_exp += char
     return parenthesis_position, original_exp
 
 def main():
