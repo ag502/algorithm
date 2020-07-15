@@ -17,24 +17,34 @@ node_name = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 is_visited = [False] * 9
 
 
-def dfs(graph, start, is_visited):
+def dfs(graph, start):
     stack = deque()
-    stack.append(start)
+    is_visited = [False] * len(graph)
+    stack.appendleft(start)
     is_visited[start] = True
+
+    answer = node_name[start] + ' '
 
     while stack:
-        current_node = stack.pop()
-        print(node_name[current_node])
-        for idx, node in enumerate(graph[current_node]):
-            if node != 0 and is_visited[idx] == False:
-                stack.append(idx)
+        top_vertex = stack[0]
+        for idx, vertex in enumerate(graph[top_vertex]):
+            if vertex != 0 and not is_visited[idx]:
+                stack.appendleft(idx)
                 is_visited[idx] = True
+                answer += node_name[idx] + ' '
+                break
+        else:
+            stack.popleft()
+
+    return answer.rstrip()
 
 
-def bfs(graph, start, is_visited):
+def bfs(graph, start):
     queue = deque()
+    is_visited = [False] * len(graph)
     queue.append(start)
     is_visited[start] = True
+
     while queue:
         current_node = queue.popleft()
         print(node_name[current_node])
@@ -46,5 +56,5 @@ def bfs(graph, start, is_visited):
 
 
 if __name__ == "__main__":
-    # dfs(graph, 0, is_visited)
-    bfs(graph, 0, is_visited)
+    print(dfs(graph, 0))
+    # bfs(graph, 0, is_visited)
