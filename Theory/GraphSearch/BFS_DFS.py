@@ -17,6 +17,16 @@ node_name = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 is_visited = [False] * 9
 
 
+def dfs_recur(graph, start):
+    is_visited[start] = True
+    answer = node_name[start] + ' '
+
+    for i in range(0, len(graph)):
+        if graph[start][i] == 1 and not is_visited[i]:
+            answer += dfs_recur(graph, i) + ' '
+    return answer.rstrip()
+
+
 def dfs(graph, start):
     stack = deque()
     is_visited = [False] * len(graph)
@@ -57,4 +67,5 @@ def bfs(graph, start):
 
 if __name__ == "__main__":
     print(dfs(graph, 0))
+    print(dfs_recur(graph, 0))
     # bfs(graph, 0, is_visited)
