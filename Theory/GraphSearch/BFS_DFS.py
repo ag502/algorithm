@@ -8,8 +8,8 @@ graph = [
     [0, 0, 1, 1, 0, 0, 0, 0, 0],
     [0, 0, 1, 0, 0, 0, 1, 1, 0],
     [0, 0, 0, 0, 0, 1, 0, 1, 0],
-    [0, 0, 0, 0, 0, 1, 1, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0]
+    [0, 0, 0, 0, 0, 1, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
 node_name = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
@@ -66,6 +66,6 @@ def bfs(graph, start):
 
 
 if __name__ == "__main__":
-    print(dfs(graph, 0))
-    print(dfs_recur(graph, 0))
-    # bfs(graph, 0, is_visited)
+    #     print(dfs(graph, 0))
+    #     print(dfs_recur(graph, 0))
+    bfs(graph, 0)
