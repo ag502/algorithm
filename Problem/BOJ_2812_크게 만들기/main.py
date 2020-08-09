@@ -1,24 +1,22 @@
 from sys import stdin
+from itertools import combinations
+
 
 def main():
     n, k = map(int, stdin.readline().split())
-    number = list(map(int, list(stdin.readline().rstrip())))
-    answer = [0] * (n - k)
+    number = stdin.readline().rstrip()
 
-    pivot = -1
-    for i in range(n - k - 1, -1, -1):
-        max_number = max(number[pivot + 1: n - i])
-        pivot = number.index(max_number)
+    number_list = list(number)
+    current_number = int(''.join(number_list[:n - k]))
 
-        if i == n - k - 1:
-            for j in range(0, pivot + 1):
-                number[j] = -1
-        else:
-            number[pivot] = -1
+    for i in range(n - k, n):
+        number_comb = combinations(list(str(current_number)), n - k - 1)
+        for comb in number_comb:
+            if current_number < int(''.join(comb) + number[i]):
+                current_number = int(''.join(comb) + number[i])
 
-        answer[n - k - 1 - i] = str(max_number)
+    print(current_number)
 
-    print(''.join(answer))
 
 if __name__ == '__main__':
     main()
