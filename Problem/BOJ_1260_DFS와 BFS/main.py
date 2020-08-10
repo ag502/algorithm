@@ -1,72 +1,38 @@
 from sys import stdin
 from collections import deque
 
-def dfs_recur(adjacency, check, start, res):
-    check[start] = True
-    res = str(start) + ' '
-    for i in range(1, len(adjacency)):
-        if adjacency[start][i] == 1 and check[i] == False:
-            res += dfs_recur(adjacency, check, i, res)
-    return res
+# is_visited = None
+# a_matrix = None
 
-def dfs_stack(adjacency, check, start):
-    visited_vertex = deque()
-    visited_vertex.appendleft(start)
-    check[start] = True
-
-    result = (str(start) + ' ')
-
-    while len(visited_vertex) != 0:
-        top_vertex = visited_vertex[0]
-        flag = False
-        for i in range(1, len(adjacency)):
-            if adjacency[top_vertex][i] == 1 and check[i] == False:
-                visited_vertex.appendleft(i)
-                result += str(i) + ' '
-                check[i] = True
-                flag = True
-                break
-
-        if not flag:
-            visited_vertex.popleft()
-
-    return result.strip()
-
-def bfs(adjacency, check, start):
-    visited_vertex = deque()
-    visited_vertex.appendleft(start)
-    check[start] = True
-
-    result = ''
-
-    while len(visited_vertex) != 0:
-        top_vertex = visited_vertex.popleft()
-        result += str(top_vertex) + ' '
-
-        for i in range(1, len(adjacency)):
-            if adjacency[top_vertex][i] == 1 and check[i] == False:
-                visited_vertex.append(i)
-                check[i] = True
-    return result.strip()
 
 def main():
-    v, e, first_v = map(int, stdin.readline().split())
-    adjacency = [[0] * (v + 1) for _ in range(v + 1)]
-    check = [False] * (v + 1)
+    N, M, V = map(int, stdin.readline().split())
+    a_matrix = [[0] * (N + 1) for _ in range(N + 1)]
+    is_visited = [False] * (N + 1)
 
-    for _ in range(e):
-        start, end = map(int, stdin.readline().split())
-        adjacency[start][end] = 1
-        adjacency[end][start] = 1
+    for _ in range(M):
+        v_1, v_2 = map(int, stdin.readline().split())
+        a_matrix[v_1][v_2] = 1
+        a_matrix[v_2][v_1] = 1
 
-    res = ''
-    print(dfs_recur(adjacency, check, first_v, res))
+    dfs(V, is_visited, a_matrix)
 
-    check = [False] * (v + 1)
-    print(dfs_stack(adjacency, check, first_v))
 
-    check = [False] * (v + 1)
-    print(bfs(adjacency, check, first_v))
+def dfs(start_vertex, is_visited, a_matrix):
+    # 1. 체크인
+    is_visited[start_vertex] = False
+    # 2. 목적지?
+    print(start_vertex)
+    # 3. 갈 수 있는 곳을 순회
+    for idx, vertex in enumerate(a_matrix[start_vertex][1:]):
+        # 4. 갈 수 있는 가?
+        if vertex == 1 and not is_visited[idx + 1]:
+            is_visited[idx + 1] = True
+            # 5. dfs(next)
+            dfs(idx + 1, is_visited, a_matrix)
+    # 6. 체크아웃
+    # is_visited[start_vertex] = False
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
