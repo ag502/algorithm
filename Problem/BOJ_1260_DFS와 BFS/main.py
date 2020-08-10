@@ -30,7 +30,6 @@ def dfs(start_vertex, is_visited, a_matrix, dfs_answer):
     # 1. 체크인
     is_visited[start_vertex] = 0
     # 2. 목적지?
-    # print(start_vertex)
     dfs_answer.append(str(start_vertex))
     # 3. 갈 수 있는 곳을 순회
     for idx, vertex in enumerate(a_matrix[start_vertex][1:]):
