@@ -2,35 +2,17 @@ from sys import stdin
 
 
 def main():
-    test_case = int(stdin.readline())
-    # prime_sum = [set([1, i]) for i in range(int(1e6) + 1)]
-    prime_sum = [0] * (int(1e6) + 1)
-    # print(prime_sum)
+    prime_nums = [0] * (int(1e6) + 1)
+    for i in range(1, len(prime_nums)):
+        for j in range(i, len(prime_nums), i):
+            prime_nums[j] += i
+        prime_nums[i] += prime_nums[i - 1]
 
-    # for i in range(2, int(1e6 ** 0.5) + 1):
-    #     for j in range(i * 2, len(prime_sum), i):
-    #         prime_sum[j].add(i)
-    #         prime_sum[j].add(j // i)
-    prime_sum[1] = 1
-    for i in range(2, len(prime_sum)):
-        prime_sum[i] = (i + 1)
+    TEST_CASE = int(stdin.readline())
 
-    for i in range(2, int(1e6 ** 0.5) + 1):
-
-        for j in range(i * 2, len(prime_sum), i):
-            prime_sum[j] += i
-            if j // i > int(1e6 ** 0.5) and j // i != i:
-                prime_sum[j] += (j // i)
-
-    # print(prime_sum)
-
-    for _ in range(test_case):
-        n = int(stdin.readline())
-        acc_sum = 0
-        for i in range(1, n + 1):
-            # acc_sum += sum(prime_sum[i])
-            acc_sum += prime_sum[i]
-        print(acc_sum)
+    for _ in range(TEST_CASE):
+        N = int(stdin.readline())
+        print(prime_nums[N])
 
 
 if __name__ == "__main__":
