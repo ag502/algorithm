@@ -15,9 +15,6 @@ adj.forEach((_, vertex) => {
   visited.set(vertex, false);
 });
 
-console.log([...adj]);
-console.log(adj.entries());
-
 const records = [];
 
 const dfs = (here) => {
@@ -47,3 +44,37 @@ const dfsAll = () => {
 
 dfsAll();
 console.log(records);
+
+const adj2 = new Map([
+  [1, [2, 3, 4]],
+  [2, [5]],
+  [3, [4]],
+  [4, [2, 5]],
+  [5, []],
+]);
+
+const inDegree = [-1, 0, 2, 1, 2, 2];
+const queue = [];
+
+const topologicalSort = () => {
+  inDegree.forEach((degree, idx) => {
+    if (degree === 0) {
+      queue.push(idx);
+    }
+  });
+
+  // console.log(queue);
+
+  while (queue.length !== 0) {
+    let here = queue.shift();
+    console.log(here);
+    adj2.get(here).forEach((there) => {
+      inDegree[there]--;
+      if (inDegree[there] === 0) {
+        queue.push(there);
+      }
+    });
+  }
+};
+
+topologicalSort();
