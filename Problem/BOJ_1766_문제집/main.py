@@ -4,47 +4,53 @@ from collections import deque
 
 def main():
     N, M = map(int, stdin.readline().split())
-    adj = {}
-    visited = {}
-    for problem_num in range(1, N + 1):
-        adj[problem_num] = []
-        visited[problem_num] = False
+    problem_adj = {}
+    for i in range(1, N + 1):
+        problem_adj[i] = []
+    in_degree = [0] * (N + 1)
+
+    queue = deque()
+    solve_sequence = []
 
     for _ in range(M):
-        A, B = map(int, stdin.readline().split())
-        adj[A].append(B)
+        start_p, end_p = map(int, stdin.readline().split())
+        problem_adj[start_p].append(end_p)
+        in_degree[end_p] += 1
 
-    adj = dict(sorted(adj.items(), key=lambda x: (-x[0])))
-    # print(adj)
-    # print(visited)
+    for problem in problem_adj.keys():
+        problem_adj[problem].sort()
 
-    records = deque()
-    # problems = list(adj.keys())
-    for problem in adj.keys():
-        # problem = problems[problem]
-        if len(adj[problem]) != 0 and not visited[problem]:
-            dfs(problem, adj, visited, records)
+    for idx, degree in enumerate(in_degree[1:]):
+        if degree == 0:
+            queue.append((idx + 1, idx + 1))
+            in_degree[idx + 1] = -1
 
-    # print(records)
+    while queue:
+        # if len(queue) != 1:
+        #     for idx, degree in enumerate(in_degree[1:]):
+        #         if degree == 0:
+        #             queue.append(idx + 1)
+        #             in_degree[idx + 1] = -1
+        #             break
 
-    answer = ""
-    while records:
-        answer += str(records.pop()) + " "
+        here = queue.popleft()
+        solve_sequence.append(here)
 
-    print(answer.rstrip())
+        for there in problem_adj[here[1]]:
+            in_degree[there] -= 1
+            if in_degree[there] == 0:
+                queue.append((here[1], there))
+                in_degree[there] = -1
 
+    print(solve_sequence)
+    solve_sequence.sort(key=lambda x: (x[0]))
+    print(solve_sequence)
 
-def dfs(here, adj, visited, records):
-    # 1. 체크인
-    visited[here] = True
-    # 2. 방문 (생략)
-    # 3. 인접 정점 순회
-    for there in adj[here]:
-        # 4. 갈 수 있는지 확인
-        if not visited[there]:
-            dfs(there, adj, visited, records)
-    # 5. 체크 아웃
-    records.append(here)
+    string = []
+    for _, problem in solve_sequence:
+        string.append(str(problem))
+
+    print(' '.join(string))
 
 
 if __name__ == "__main__":
