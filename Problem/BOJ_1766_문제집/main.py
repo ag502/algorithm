@@ -1,5 +1,6 @@
 from sys import stdin
 from collections import deque
+from heapq import heappush, heappop, heapify
 
 
 def main():
@@ -7,50 +8,37 @@ def main():
     problem_adj = {}
     for i in range(1, N + 1):
         problem_adj[i] = []
+
     in_degree = [0] * (N + 1)
 
-    queue = deque()
-    solve_sequence = []
-
     for _ in range(M):
-        start_p, end_p = map(int, stdin.readline().split())
-        problem_adj[start_p].append(end_p)
-        in_degree[end_p] += 1
+        p1, p2 = map(int, stdin.readline().split())
+        problem_adj[p1].append(p2)
+        in_degree[p2] += 1
 
-    for problem in problem_adj.keys():
-        problem_adj[problem].sort()
-
-    for idx, degree in enumerate(in_degree[1:]):
+    pq = []
+    answer = []
+    for idx in range(1, len(in_degree)):
+        problem_num = idx
+        degree = in_degree[idx]
         if degree == 0:
-            queue.append((idx + 1, idx + 1))
-            in_degree[idx + 1] = -1
+            heappush(pq, problem_num)
 
-    while queue:
-        # if len(queue) != 1:
-        #     for idx, degree in enumerate(in_degree[1:]):
-        #         if degree == 0:
-        #             queue.append(idx + 1)
-        #             in_degree[idx + 1] = -1
-        #             break
+    for _ in range(N):
+        if not pq:
+            return
 
-        here = queue.popleft()
-        solve_sequence.append(here)
+        # cur_problem = queue.popleft()
+        cur_problem = heappop(pq)
+        answer.append(cur_problem)
 
-        for there in problem_adj[here[1]]:
-            in_degree[there] -= 1
-            if in_degree[there] == 0:
-                queue.append((here[1], there))
-                in_degree[there] = -1
+        for problem_num in problem_adj[cur_problem]:
+            in_degree[problem_num] -= 1
+            if in_degree[problem_num] == 0:
+                # queue.append(problem_num)
+                heappush(pq, problem_num)
 
-    print(solve_sequence)
-    solve_sequence.sort(key=lambda x: (x[0]))
-    print(solve_sequence)
-
-    string = []
-    for _, problem in solve_sequence:
-        string.append(str(problem))
-
-    print(' '.join(string))
+    print(' '.join(map(str, answer)))
 
 
 if __name__ == "__main__":
