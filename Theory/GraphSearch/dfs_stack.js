@@ -35,6 +35,7 @@ const dfsStack = (here) => {
         stack.push(vertex);
         visited.set(vertex, true);
         isAddToStack = true;
+        console.log(vertex);
         break;
       }
     }
