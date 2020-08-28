@@ -1,48 +1,42 @@
 from sys import stdin
-from collections import Counter
-
-def is_decreasing_number(number):
-    if 0 <= number <= 9:
-        return True
-
-    # digit_array = list(map(int, str(number)))
-    # for index in range(len(digit_array) - 1):
-    #     if digit_array[index] - digit_array[index + 1] <= 0:
-    #         return False
-    # return True
-
-    string_number = str(number)
-    digit_counter = Counter(string_number).most_common(1)
-
-    if digit_counter[0][1] > 1:
-        return False
-
-    sorted_string_number = sorted(string_number, reverse=True)
-
-    if string_number == ''.join(sorted_string_number):
-        return True
-    else:
-        return False
 
 
 def main():
-    n = int(stdin.readline())
+    N = int(stdin.readline().rstrip())
 
-    if n > 1023:
+    visited = [0] * 10
+
+    decreasing_num_list = []
+
+    for i in range(1, 11):
+        for j in range(10):
+            get_decreasing_num(j, i, 0, visited, decreasing_num_list, [])
+
+    if len(decreasing_num_list) < N:
         print(-1)
-        return
+    else:
+        print(decreasing_num_list[N - 1])
 
-    count = 0
-    number = 0
-    while 1:
-        print(number)
-        if is_decreasing_number(number):
-            count += 1
-        if count == n :
-            print(number)
-            return
-        number += 1
+
+def get_decreasing_num(cur_digit, m, selected_num, visited, decreasing_num_list, answer):
+    # 1. 체크인
+    visited[cur_digit] = True
+    selected_num += 1
+    # 2. 목적지
+    answer.append(str(cur_digit))
+    # 3. 가능성 있는 숫자 순회
+    for next_digit in range(0, cur_digit):
+        # 4. 갈 수 있는지 검사
+        if selected_num != m and not visited[next_digit]:
+            get_decreasing_num(next_digit, m, selected_num,
+                               visited, decreasing_num_list, answer)
+    # 5. 체크아웃
+    if len(answer) == m:
+        decreasing_num_list.append(int(''.join(answer)))
+    answer.pop()
+    selected_num -= 1
+    visited[cur_digit] = False
+
 
 if __name__ == "__main__":
     main()
-    # print(is_decreasing_number(9764320))
