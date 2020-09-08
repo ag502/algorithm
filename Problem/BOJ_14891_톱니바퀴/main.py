@@ -1,53 +1,64 @@
 from sys import stdin
 from collections import deque
 
-def rotation_gear(gear, direction):
+def main():
+    gears = []
+    gears.append(deque(list(stdin.readline().rstrip())))
+    gears.append(deque(list(stdin.readline().rstrip())))
+    gears.append(deque(list(stdin.readline().rstrip())))
+    gears.append(deque(list(stdin.readline().rstrip())))
+
+    gears_overlap = [[0, 0] for _ in range(4)]
+
+    rotation_num = int(stdin.readline().rstrip())
+
+    for _ in range(rotation_num):
+        rotation_gear, rotation_dir = map(int, stdin.readline().split())
+
+        for gear_num in range(4):
+            gears_overlap[gear_num][0] = gears[gear_num][6]
+            gears_overlap[gear_num][1] = gears[gear_num][2]
+
+        rotation(gears[rotation_gear - 1], rotation_dir)
+
+        cur_gear = rotation_gear
+        next_rotation_dir = rotation_dir
+        for gear_num in range(rotation_gear - 1, 0, -1):
+            if gears_overlap[cur_gear - 1][0] != gears_overlap[gear_num - 1][1]:
+                next_rotation_dir = -next_rotation_dir
+                rotation(gears[gear_num - 1], next_rotation_dir)
+                cur_gear = gear_num
+            else:
+                break
+
+        cur_gear = rotation_gear
+        next_rotation_dir = rotation_dir
+        for gear_num in range(rotation_gear + 1, 5, 1):
+            if gears_overlap[cur_gear - 1][1] != gears_overlap[gear_num - 1][0]:
+                next_rotation_dir = -next_rotation_dir
+                rotation(gears[gear_num - 1], next_rotation_dir)
+                cur_gear = gear_num
+            else:
+                break
+
+    answer = 0
+    for idx, gear in enumerate(gears):
+        if gear[0] == '1':
+            if idx == 0:
+                answer += 1
+            elif idx == 1:
+                answer += 2
+            elif idx == 2:
+                answer += 4
+            elif idx == 3:
+                answer += 8
+    print(answer)
+
+def rotation(gear, direction):
     if direction == -1:
         gear.append(gear.popleft())
     elif direction == 1:
         gear.appendleft(gear.pop())
-
-def main():
-    gears = {}
-    for i in range(1, 5):
-        gears[i] = deque(list(stdin.readline().rstrip()))
-
-    rotation_num = int(stdin.readline())
-    for _ in range(rotation_num):
-        meeting_point = [0, (-1, gears[1][2]), (gears[2][6], gears[2][2]), (gears[3][6], gears[3][2]), (gears[4][6], -1)]
-        selected_gear, direction = map(int, stdin.readline().split())
-
-        rotation_gear(gears[selected_gear], direction)
-        start_point = meeting_point[selected_gear][1]
-        for i in range(selected_gear + 1, len(meeting_point)):
-            if start_point != meeting_point[i][0]:
-                direction = -direction
-                rotation_gear(gears[i], direction)
-            else:
-                break
-            start_point = meeting_point[i][1]
-
-        start_point = meeting_point[selected_gear][0]
-        for i in range(selected_gear - 1, 0, -1):
-            if start_point != meeting_point[i][1]:
-                direction = -direction
-                rotation_gear(gears[i], direction)
-            else:
-                break
-            start_point = meeting_point[i][0]
-
-    score = 0
-    for gear_num in gears:
-        # print(gear_num)
-        if gear_num == 1:
-            score += int(gears[gear_num][0]) * 1
-        elif gear_num == 2:
-            score += int(gears[gear_num][0]) * 2
-        elif gear_num == 3:
-            score += int(gears[gear_num][0]) * 4
-        else:
-            score += int(gears[gear_num][0]) * 8
-    print(score)
 
 if __name__ == '__main__':
     main()
