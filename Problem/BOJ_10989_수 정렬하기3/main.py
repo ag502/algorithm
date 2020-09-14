@@ -2,17 +2,15 @@ from sys import stdin
 
 
 def main():
-    test_case = int(stdin.readline())
-    number_array = [0] * 10001
+    N = int(stdin.readline().rstrip())
+    numbers = [0] * 10001
 
-    for _ in range(test_case):
-        number_array[int(stdin.readline())] += 1
+    for _ in range(N):
+        numbers[int(stdin.readline().rstrip())] += 1
 
-    for idx in range(len(number_array)):
-        if number_array[idx] != 0:
-            for _ in range(number_array[idx]):
-                print(idx)
-
+    for number in range(1, 10001):
+        for _ in range(numbers[number]):
+            print(number)
 
 if __name__ == "__main__":
     main()
