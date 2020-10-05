@@ -39,6 +39,7 @@ def main():
                 answer.add(chars[i] + " => " + chars[j])
 
     answer = sorted(answer)
+    print(len(answer))
     for proposition in answer:
         print(proposition)
 
