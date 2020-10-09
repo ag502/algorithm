@@ -1,63 +1,85 @@
 from sys import stdin
 
-def identify_card(card_nums):
-    # 1. 연속된 숫자
-    is_continuous = True
-    for idx in range(len(card_nums) - 1):
-        if int(card_nums[idx + 1][0]) - int(card_nums[idx][0]) != 1:
-            is_continuous = False
-    if is_continuous:
-        return 'CONTINUOUS'
-
-    # 2. 4장이 같은 숫자
-    is_four_same = False
-    for number, count in card_nums:
-        if count == 4:
-            is_four_same = True
-            break
-    if is_four_same:
-        return 'FOUR_SAME'
-
-    # 3. 3장, 2장이 같음
-    is_three_two_same = 0
-    for number, count
 def main():
-    info = {'color': set(),
-            'number': {},
-            'max_num': 0,
-            'min_num': 10,
-            }
-
+    cards = []
     for _ in range(5):
-        color, number = list(stdin.readline().split())
-        info['color'].add(color)
+        card = stdin.readline().split()
+        cards.append(card)
+    cards = sorted(cards, key=lambda x: x[1])
+    info = verify_cards(cards)
 
-        if int(number) in info['number']:
-            info['number'][number] += 1
-        else:
-            info['number'][number] = 1
-
-        if int(number) > info['max_num']:
-            info['max_num'] = int(number)
-        if int(number) < info['min_num']:
-            info['min_num'] = int(number)
-
-    color_count = info['color']
-    number_count = sorted(info['number'].items())
     answer = 0
+    if info['all_same_color'] and info['all_continuous']:
+        answer = info['max_num'] + 900
+    elif info['four_same_number'] != False:
+        answer = info['four_same_number'][1] + 800
+    elif info['three_same_number'] != False and info['two_same_number_1'] != False:
+        answer = info['three_same_number'][1] * 10 + info['two_same_number_1'][1] + 700
+    elif info['all_same_color']:
+        answer = info['max_num'] + 600
+    elif info['all_continuous']:
+        answer = info['max_num'] + 500
+    elif info['three_same_number'] != False:
+        answer = info['three_same_number'][1] + 400
+    elif info['two_same_number_1'] != False and info['two_same_number_2'] != False:
+        answer = max(info['two_same_number_1'][1], info['two_same_number_2'][1]) * 10 + \
+            min(info['two_same_number_1'][1], info['two_same_number_2'][1]) + 300
+    elif info['two_same_number_1'] != False and not info['two_same_number_2']:
+        answer = info['two_same_number_1'][1] + 200
+    else:
+        answer = info['max_num'] + 100
+    print(answer)
 
-    if len(color_count) == 1:
-        is_continuous = True
-        for idx in range(len(number_count) - 1):
-            if int(number_count[idx + 1][0]) - int(number_count[idx][0]) != 1:
-                is_continuous = False
-                break
-        if is_continuous:
-            answer = info['max_num'] + 900
-    # elif
+def verify_cards(cards):
+    info = {
+        'all_same_color': False,
+        'all_continuous': False,
+        'two_same_number_1': False,
+        'two_same_number_2' : False,
+        'three_same_number': False,
+        'four_same_number': False,
+        'max_num': int(cards[4][1])
+    }
+    cards_number = {}
+    cards_color = set()
 
-    print(color_count)
-    print(number_count)
+    prev_num = 0
+    cur_num = 0
+    flag = False
+    for idx, card in enumerate(cards):
+        color = card[0]
+        number = int(card[1])
+        cur_num = number
+
+        cards_color.add(color)
+        if number in cards_number:
+            cards_number[number] += 1
+        else:
+            cards_number[number] = 1
+
+        if idx != 0:
+            if cur_num - prev_num == 1 and not flag:
+                info['all_continuous'] = True
+            else:
+                flag = True
+                info['all_continuous'] = False
+        prev_num = cur_num
+
+    if len(cards_color) == 1:
+        info['all_same_color'] = True
+
+    for number, num_count in cards_number.items():
+        if num_count == 4:
+            info['four_same_number'] = [True, number]
+        elif num_count == 3:
+            info['three_same_number'] = [True, number]
+        elif num_count == 2:
+            if not info['two_same_number_1']:
+                info['two_same_number_1'] = [True, number]
+            else:
+                info['two_same_number_2'] = [True, number]
+
+    return info
 
 if __name__ == '__main__':
     main()
