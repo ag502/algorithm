@@ -1,14 +1,16 @@
-from sys import stdin, setrecursionlimit
+from sys import stdin
 
-def permutation(n, cur_number, visited, answer, temp):
+def permutation(n, numbers, cur_idx, visited, answer, temp):
     # 1. 방문
+    cur_number = numbers[cur_idx]
     visited[cur_number] = True
     # 2. 도착
     temp.append(cur_number)
     # 3. 탐색
-    for next_number in range(10):
+    for next_idx in range(len(numbers)):
+        next_number = numbers[next_idx]
         if not visited[next_number] and len(temp) < n:
-            permutation(n, next_number, visited, answer, temp)
+            permutation(n, numbers, next_idx, visited, answer, temp)
     # 4. 체크아웃
     visited[cur_number] = False
     if len(temp) == n:
@@ -30,11 +32,12 @@ def main():
 
     visited = [False] * 10
     alphabets = list(alphabets)
+    numbers = [i for i in range(9, 9 - len(alphabets), -1)]
     answer = []
-    for number in range(10):
-        permutation(len(alphabets), number, visited, answer, [])
 
-    # print(answer)
+    for idx in range(len(numbers)):
+        permutation(len(alphabets), numbers, idx, visited, answer, [])
+
     max_value = -1
     for num_list in answer:
         table = {}
