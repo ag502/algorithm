@@ -1,5 +1,5 @@
 from sys import stdin, setrecursionlimit
-setrecursionlimit(10 ** 9)
+setrecursionlimit(10000)
 
 def post_order(node_list):
     if len(node_list) == 0:
