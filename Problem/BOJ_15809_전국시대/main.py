@@ -17,7 +17,7 @@ def alliance(parents, rank, powers, country1, country2):
         rank[country2_root] = temp
 
     parents[country2_root] = country1_root
-    powers[country1_root] += + powers[country2]
+    powers[country1_root] += powers[country2_root]
 
     if rank[country1_root] == rank[country2_root]:
         rank[country1_root] += 1
@@ -30,15 +30,16 @@ def fight(parents, ranks, powers, country1, country2):
         parents[country2_root] = country1_root
         powers[country1_root] -= powers[country2_root]
         if ranks[country2_root] > ranks[country1_root]:
-            ranks[country2_root] += ranks[country1_root]
+            ranks[country1_root] += ranks[country2_root]
 
         if ranks[country1_root] == ranks[country2_root]:
             ranks[country1_root] += 1
+
     elif powers[country1_root] < powers[country2_root]:
         parents[country1_root] = country2_root
         powers[country2_root] -= powers[country1_root]
         if ranks[country2_root] < ranks[country1_root]:
-            ranks[country1_root] += ranks[country2_root]
+            ranks[country2_root] += ranks[country1_root]
 
         if ranks[country1_root] == ranks[country2_root]:
             ranks[country2_root] += 1
@@ -68,7 +69,8 @@ def main():
     answer_country = set()
     answer_power = []
     for country in parents[1:]:
-        answer_country.add(find(parents, country))
+        if powers[country] != 0:
+            answer_country.add(find(parents, country))
 
     for country in answer_country:
         answer_power.append(powers[country])
