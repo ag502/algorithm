@@ -1,4 +1,5 @@
-from sys import stdin
+from sys import stdin, setrecursionlimit
+setrecursionlimit(10000)
 
 def find(island, parents):
     if parents[island] == island:
@@ -13,7 +14,9 @@ def main():
 
     for _ in range(islands - 2):
         island_1, island_2 = map(int, stdin.readline().split())
-        parents[island_2] = island_1
+        island_1_root = find(island_1, parents)
+        island_2_root = find(island_2, parents)
+        parents[island_2_root] = island_1_root
 
     roots = set()
     for island in parents[1:]:
