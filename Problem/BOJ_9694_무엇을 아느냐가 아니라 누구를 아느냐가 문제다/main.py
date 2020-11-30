@@ -21,7 +21,7 @@ def dijkstra(relations, num_of_politician):
                 heappush(heap, [dist[next_politician], next_politician])
     return dist
 
-def dfs(relations, visited, cur_politician, acc_dist, max_dist, path, final_politician, answer):
+def dfs(relations, visited, cur_politician, acc_dist, max_dist, path, final_politician, answer, t):
     # 1. 방문
     visited[cur_politician] = True
     # 2. 도착
@@ -30,11 +30,11 @@ def dfs(relations, visited, cur_politician, acc_dist, max_dist, path, final_poli
     for next_politician_info in relations[cur_politician]:
         next_politician, next_dist = next_politician_info['politician'], next_politician_info['type']
         if not visited[next_politician] and acc_dist + next_dist <= max_dist:
-            dfs(relations, visited, next_politician, acc_dist + next_dist, max_dist, path, final_politician, answer)
+            dfs(relations, visited, next_politician, acc_dist + next_dist, max_dist, path, final_politician, answer, t)
     # 4. 체크아웃
     if acc_dist == max_dist and cur_politician == final_politician:
-        answer = path[:]
-        print(answer)
+        print('Case #{}: {}'.format(t, ' '.join(map(str, path))))
+        return
     visited[cur_politician] = False
     path.pop()
 
@@ -61,8 +61,7 @@ def main():
         else:
             visited = [False] * num_of_politician
             answer = []
-            dfs(relations, visited, 0, 0, dist[num_of_politician - 1], [], num_of_politician - 1, answer)
-            print(answer)
+            dfs(relations, visited, 0, 0, dist[num_of_politician - 1], [], num_of_politician - 1, answer, t + 1)
 
 if __name__ == '__main__':
     main()
