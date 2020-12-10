@@ -1,70 +1,41 @@
-from sys import stdin
+from sys import stdin, setrecursionlimit
+setrecursionlimit(10000)
 
-class Node:
-    def __init__(self, parent, left, right):
-        self.__parent = parent
-        self.__left = left
-        self.__right = right
+def dfs(tree, visited, parents, cur_node, prev_node):
+    # 방문
+    visited[cur_node] = True
+    if cur_node != 1:
+        parents[cur_node] = prev_node
 
-    @property
-    def parent(self):
-        return self.__parent
+    # 주변 탐색
+    for next_node in tree[cur_node]:
+        if not visited[next_node]:
+            dfs(tree, visited, parents, next_node, cur_node)
 
-    @parent.setter
-    def parent(self, node):
-        self.__parent = node
+    # 체크아웃
+    visited[cur_node] = False
 
-    @property
-    def left(self):
-        return self.__left
-
-    @left.setter
-    def left(self, node):
-        self.__left = node
-
-    @property
-    def right(self):
-        return self.__right
-
-    @right.setter
-    def right(self, node):
-        self.__right = node
-
-def check_children(node):
-    if node.left is None:
-        return 'RIGHT'
-    else:
-        return 'LEFT'
 
 def main():
     stdin = open('./input.txt', 'r')
-    num_of_node = int(stdin.readline())
+    num_of_nodes = int(stdin.readline())
 
-    nodes = [None] * (num_of_node + 1)
-    # nodes[1] = 1
-    nodes[1] = Node(None, None, None)
+    tree = {}
+    for node in range(1, num_of_nodes + 1):
+        tree[node] = []
 
-    for _ in range(num_of_node - 1):
+    for _ in range(num_of_nodes - 1):
         node_1, node_2 = map(int, stdin.readline().split())
+        tree[node_1].append(node_2)
+        tree[node_2].append(node_1)
 
-        if nodes[node_1] is not None:
-            # if check_children(nodes[node_1]) == 'RIGHT':
-            #     nodes[node_1].right = node_2
-            # else:
-            #     nodes[node_1].left = node_2
-            nodes[node_2] = Node(node_1, None, None)
-        else:
-            # if check_children(nodes[node_2]) == 'RIGHT':
-            #     nodes[node_2].right = node_1
-            # else:
-            #     nodes[node_2].left = node_1
-            nodes[node_1] = Node(node_2, None, None)
+    visited = [False] * (num_of_nodes + 1)
+    parent = [-1] * (num_of_nodes + 1)
 
-    for node in nodes[2:]:
-        print(node.parent)
+    dfs(tree, visited, parent, 1, None)
+
+    for parent_node in parent[2:]:
+        print(parent_node)
 
 if __name__ == '__main__':
     main()
-
-
-
