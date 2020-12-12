@@ -1,5 +1,7 @@
 from sys import stdin
 
+answer = []
+
 def insert_plus(number):
     operation = []
     for idx, digit in enumerate(number):
@@ -8,12 +10,12 @@ def insert_plus(number):
             operation.append("+")
     return ''.join(operation)
 
-def dfs(numbers, target_number, answer, temp, cur_number, acc_sum):
+def dfs(numbers, target_number, temp, cur_number, acc_sum):
     temp.append(cur_number)
 
     for next_number in numbers:
         if acc_sum + next_number <= target_number:
-            dfs(numbers, target_number, answer, temp, next_number, acc_sum + next_number)
+            dfs(numbers, target_number, temp, next_number, acc_sum + next_number)
 
     if acc_sum == target_number:
         answer.append(''.join(map(str, temp)))
@@ -24,9 +26,8 @@ def main():
     n, k = map(int, stdin.readline().split())
 
     numbers = [1, 2, 3]
-    answer = []
     for number in numbers:
-        dfs(numbers, n, answer, [], number, number)
+        dfs(numbers, n, [], number, number)
 
     answer.sort()
 
