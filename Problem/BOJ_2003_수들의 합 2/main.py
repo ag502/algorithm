@@ -1,27 +1,24 @@
 from sys import stdin
 
-
 def main():
-    N, M = map(int, stdin.readline().split())
-    nums = list(map(int, stdin.readline().split())) + [0]
+    stdin = open('./input.txt', 'r')
+    length_of_array, m = map(int, stdin.readline().split())
+    array = list(map(int, stdin.readline().split())) + [0]
 
-    low = high = 0
-    answer = 0
-    sum_of_number = nums[low]
-
-    while high < N:
-        if sum_of_number == M:
-            answer += 1
-            sum_of_number -= nums[low]
-            low += 1
-        elif sum_of_number > M:
-            sum_of_number -= nums[low]
-            low += 1
+    num_of_case = 0
+    sum_of_sub_array = 0
+    start = end = 0
+    while start <= end <= length_of_array:
+        if sum_of_sub_array >= m:
+            sum_of_sub_array -= array[start]
+            start += 1
         else:
-            high += 1
-            sum_of_number += nums[high]
-    print(answer)
+            sum_of_sub_array += array[end]
+            end += 1
 
+        if sum_of_sub_array == m:
+            num_of_case += 1
+    print(num_of_case)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
