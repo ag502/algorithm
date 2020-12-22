@@ -8,16 +8,16 @@ def main():
     num_of_case = 0
     sum_of_sub_array = 0
     start = end = 0
-    while start <= end <= length_of_array:
-        if sum_of_sub_array >= m:
-            sum_of_sub_array -= array[start]
-            start += 1
-        else:
+    while end <= length_of_array:
+        if sum_of_sub_array < m:
             sum_of_sub_array += array[end]
             end += 1
-
+        elif sum_of_sub_array >= m:
+            sum_of_sub_array -= array[start]
+            start += 1
         if sum_of_sub_array == m:
             num_of_case += 1
+
     print(num_of_case)
 
 if __name__ == '__main__':
