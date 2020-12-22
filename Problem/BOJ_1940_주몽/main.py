@@ -9,13 +9,20 @@ def main():
     array.sort()
 
     num_of_armor = 0
-    for i in range(len(array) - 1):
-        for j in range(i + 1, len(array)):
-            sum_of_gradient = array[i] + array[j]
-            if sum_of_gradient == m:
-                num_of_armor += 1
-            elif sum_of_gradient > m:
-                break
+    start = 0
+    end = len(array) - 1
+
+    while start < end:
+        sum_of_gradient = array[start] + array[end]
+        if sum_of_gradient < m:
+            start += 1
+        elif sum_of_gradient > m:
+            end -= 1
+        else:
+            num_of_armor += 1
+            start += 1
+            end -= 1
+
     print(num_of_armor)
 
 if __name__ == '__main__':
