@@ -1,13 +1,13 @@
 from sys import stdin
 
 
-def upper_bound(array, start_idx, target):
+def lower_bound(array, start_idx, end_idx, target):
     start = start_idx
-    end = len(array) - 1
+    end = end_idx
 
     while start <= end:
         mid = (start + end) // 2
-        if array[mid] <= target:
+        if array[mid] < target:
             start = mid + 1
         else:
             end = mid - 1
@@ -22,9 +22,8 @@ def main():
     sizes.sort()
 
     num_of_check_files = 0
-    for idx in range(len(sizes) - 1):
-        print(upper_bound(sizes, idx + 1, sizes[idx] * 0.9))
-        num_of_check_files += upper_bound(sizes, idx + 1, sizes[idx] * 0.9)
+    for idx in range(len(sizes) - 1, 0, -1):
+        num_of_check_files += idx - lower_bound(sizes, 0, idx - 1, sizes[idx] * 0.9)
 
     print(num_of_check_files)
 
