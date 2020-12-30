@@ -9,15 +9,22 @@ def main():
     for _ in range(broken_traffic_lights):
         traffic_lights[int(stdin.readline())] = 0
 
-    start = 0
-    end = broken_traffic_lights
-    while start <= end:
-        mid = (start + end) // 2
-        if num_of_traffic_lights - broken_traffic_lights + mid >= k:
-            end = mid - 1
-        else:
-            start = mid + 1
-    print(start)
+    broken_lights_prefix = [0] * (num_of_traffic_lights + 1)
+    count = 0
+    for idx in range(1, k + 1):
+        if traffic_lights[idx] == 0:
+            count += 1
+    broken_lights_prefix[k] = count
+
+    for idx in range(k + 1, len(traffic_lights)):
+        count = broken_lights_prefix[idx - 1]
+        if traffic_lights[idx] == 0:
+            count += 1
+        if traffic_lights[idx - k] == 0:
+            count -= 1
+        broken_lights_prefix[idx] = count
+
+    print(min(broken_lights_prefix[k:]))
 
 
 if __name__ == '__main__':
