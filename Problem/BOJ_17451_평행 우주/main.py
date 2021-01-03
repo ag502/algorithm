@@ -1,4 +1,4 @@
-from sys import stdin
+from sys import stdin, maxsize
 from math import floor
 
 
@@ -12,8 +12,8 @@ def is_valid(velocities, cur_velocity):
 
 
 def search_velocity(velocities):
-    start_velocity = 1
-    end_velocity = 10 ** 9
+    start_velocity = max(velocities)
+    end_velocity = maxsize
 
     while start_velocity <= end_velocity:
         mid_velocity = (start_velocity + end_velocity) // 2
