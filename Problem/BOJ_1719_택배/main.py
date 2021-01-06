@@ -1,42 +1,66 @@
 from sys import stdin
+from collections import deque
 from heapq import heappush, heappop
+
+
+def dijkstra(herbs, start_herb):
+    pq = []
+    dist = [float('inf')] * (len(herbs) + 1)
+    parents = [-1] * (len(herbs) + 1)
+
+    heappush(pq, (0, start_herb))
+    dist[start_herb] = 0
+    parents[start_herb] = start_herb
+
+    while len(pq) != 0:
+        cur_dist, cur_herb = heappop(pq)
+
+        if cur_dist > dist[cur_herb]:
+            continue
+        for next_dist, next_herb in herbs[cur_herb]:
+            if cur_dist + next_dist < dist[next_herb]:
+                dist[next_herb] = cur_dist + next_dist
+                heappush(pq, (dist[next_herb], next_herb))
+                parents[next_herb] = cur_herb
+
+    return dist, parents
+
+
+def shortest_path(parent, start_herb, cur_herb):
+    path = deque()
+    while parent[cur_herb] != cur_herb:
+        path.appendleft(cur_herb)
+        cur_herb = parent[cur_herb]
+    path.appendleft(start_herb)
+    return path
+
 
 def main():
     stdin = open('./input.txt', 'r')
-    num_of_stock_places, num_of_paths = map(int, stdin.readline().split())
-    stock_places = {}
-    for i in range(1, num_of_stock_places + 1):
-        stock_places[i] = []
+    num_of_herbs, num_of_paths = map(int, stdin.readline().split())
+
+    herbs = {}
+    for i in range(1, num_of_herbs + 1):
+        herbs[i] = []
 
     for _ in range(num_of_paths):
-        p1, p2, distance = map(int, stdin.readline().split())
-        stock_places[p1].append([p2, distance])
-        stock_places[p2].append([p1, distance])
+        start_herb, finish_herb, time = map(int, stdin.readline().split())
+        herbs[start_herb].append((time, finish_herb))
+        herbs[finish_herb].append((time, start_herb))
 
-    answer = []
-    for stock_place in range(1, num_of_stock_places + 1):
-        heap = []
-        stop_places = []
-        dist = [float('inf')] * (num_of_stock_places + 1)
+    path_table = [["-"] * len(herbs) for _ in range(len(herbs))]
 
-        heappush(heap, [0, stock_place])
-        dist[stock_place] = 0
+    for start_herb in herbs.keys():
+        dist, parents = dijkstra(herbs, start_herb)
 
-        while len(heap) != 0:
-            cur_dist, cur_place = heappop(heap)
+        for end_herb, distance in enumerate(dist):
+            if end_herb != 0 and distance != 0:
+                path = shortest_path(parents, start_herb, end_herb)
+                path_table[start_herb - 1][end_herb - 1] = str(path[1])
 
-            if cur_dist > dist[cur_place]:
-                continue
+    for row in path_table:
+        print(' '.join(row))
 
-            for next_place, next_dist in stock_places[cur_place]:
-                if dist[next_place] > next_dist + cur_dist:
-                    dist[next_place] = next_dist + cur_dist
-                    heappush(heap, [next_dist + cur_dist, next_place])
-                    stop_places.append([cur_place, next_place])
-        print(dist)
-        answer.append(stop_places)
-
-    print(answer)
 
 if __name__ == '__main__':
     main()
