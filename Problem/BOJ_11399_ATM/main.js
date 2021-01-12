@@ -5,10 +5,10 @@ const numOfPeople = parseInt(input[0])
 const time = input[1].split(" ").map(elem => parseInt(elem)).sort((a, b) => a - b)
 
 let spentTime = 0
-const accTime = time.reduce((acc, elem) => {
-    spentTime += acc
+let acc = 0
+time.forEach(elem => {
     acc += elem
-    return acc
-}, 0)
+    spentTime += acc
+})
 
-console.log(spentTime + accTime)
+console.log(spentTime)
