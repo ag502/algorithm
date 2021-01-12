@@ -1,21 +1,26 @@
 from sys import stdin
-from itertools import combinations
+from heapq import heappush, heappop
 
 
 def main():
-    n, k = map(int, stdin.readline().split())
-    number = stdin.readline().rstrip()
+    stdin = open('./input.txt', 'r')
+    num_of_digits, num_of_delete_digits = map(int, stdin.readline().split())
+    number = map(int, stdin.readline())
 
-    number_list = list(number)
-    current_number = int(''.join(number_list[:n - k]))
+    heap = []
+    for idx, digit in enumerate(number):
+        heappush(heap, (digit, idx))
 
-    for i in range(n - k, n):
-        number_comb = combinations(list(str(current_number)), n - k - 1)
-        for comb in number_comb:
-            if current_number < int(''.join(comb) + number[i]):
-                current_number = int(''.join(comb) + number[i])
+    for _ in range(num_of_delete_digits):
+        heappop(heap)
 
-    print(current_number)
+    heap.sort(key=lambda x: x[1])
+
+    answer = ''
+    for digit, idx in heap:
+        answer += str(digit)
+
+    print(answer)
 
 
 if __name__ == '__main__':
