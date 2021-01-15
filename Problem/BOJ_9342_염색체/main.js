@@ -1,5 +1,5 @@
 const fs = require('fs')
-const input = fs.readFileSync('./input.txt').toString().split("\n").map(elem => elem.trim())
+const input = fs.readFileSync('./input.txt').toString().trim().split("\n")
 const [numOfChromosomes, ...chromosomes] = input
 
 function checkPatterns (chromosome) {
