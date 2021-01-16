@@ -1,13 +1,3 @@
-6
-A(B|_)C
-ADC
-A(B|D|_)C
-ADC
-A(B|CD(E|_)G)E
-BOY
-AE_
-AE
-_(B|D|E)A
-BDA
+1
 A(_|B)C
 ABC
