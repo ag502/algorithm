@@ -16,7 +16,6 @@ def bfs(board, rows, cols, cur_row, cur_col, max_horse_moving_count):
         for _ in range(size):
             horse_moving_count, cur_row, cur_col = queue.popleft()
             print(horse_moving_count, cur_row, cur_col)
-            # board[cur_row][cur_col] = -1
 
             if cur_row == rows - 1 and cur_col == cols - 1:
                 return moving_count
@@ -36,7 +35,7 @@ def bfs(board, rows, cols, cur_row, cur_col, max_horse_moving_count):
                     if 0 <= next_row < rows and 0 <= next_col < cols:
                         if board[next_row][next_col] == 0:
                             queue.append([horse_moving_count - 1, next_row, next_col])
-                            # board[next_row][next_col] = -2
+                            board[next_row][next_col] = -1
 
         moving_count += 1
     return -1
