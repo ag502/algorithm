@@ -1,4 +1,4 @@
 3
 ftp://acm.baylor.edu:1234/pub/staff/mr-p
 http://www.informatik.uni-ulm.de/acm
-gopher://veryold.edu/:index,:1256/index.html
+gopher://veryold.edu
