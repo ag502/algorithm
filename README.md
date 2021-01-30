@@ -1,3 +1,3 @@
 # Algorithm
 
-It's for algorithm study!!
+It's for algorithm study!!!
