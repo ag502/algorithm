@@ -1,37 +1,42 @@
 from sys import stdin
 
 
-def can_install(houses, distance, num_of_routers):
-    cur_house = houses[0]
+def can_install(distance):
+    cur_home_pos = house_pos[0]
     count = 1
-    for idx in range(1, len(houses)):
-        if houses[idx] - cur_house >= distance:
-            cur_house = houses[idx]
+    for idx in range(1, len(house_pos)):
+        if house_pos[idx] - cur_home_pos >= distance:
+            cur_home_pos = house_pos[idx]
             count += 1
-    return num_of_routers <= count
+    if count >= num_of_routers:
+        return True
+    return False
 
 
-def main():
-    stdin = open('./input.txt', 'r')
-    num_of_houses, num_of_routers = map(int, stdin.readline().split())
-    houses = [0] * num_of_houses
+def binary_search():
+    start = 0
+    end = max(house_pos)
 
-    for idx in range(num_of_houses):
-        houses[idx] = int(stdin.readline())
-
-    houses.sort()
-
-    start = 1
-    end = max(houses)
-    answer = -1
     while start <= end:
         mid = (start + end) // 2
-        if can_install(houses, mid, num_of_routers):
-            answer = mid
+        if can_install(mid):
             start = mid + 1
         else:
             end = mid - 1
-    print(answer)
+    return end
+
+
+def main():
+    stdin = open("./input.txt", "r")
+    global num_of_homes, num_of_routers, house_pos
+
+    num_of_homes, num_of_routers = map(int, stdin.readline().split())
+    house_pos = []
+    for _ in range(num_of_homes):
+        house_pos.append(int(stdin.readline()))
+    house_pos.sort()
+
+    print(binary_search())
 
 
 if __name__ == '__main__':
