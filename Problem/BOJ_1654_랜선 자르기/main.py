@@ -1,25 +1,39 @@
 from sys import stdin
 
 
-def main():
-    k, n = list(map(int, stdin.readline().split()))
-    length_of_cables = [int(stdin.readline()) for _ in range(k)]
+def cut_lan(cur_length):
+    num_of_lan = 0
+    for lan in lans:
+        num_of_lan += lan // cur_length
+    return num_of_lan
 
-    start, end = 1, max(length_of_cables)
+
+def binary_search():
+    start = 1
+    end = max(lans)
 
     while start <= end:
         mid = (start + end) // 2
-        lines = 0
-
-        for cable in length_of_cables:
-            lines += cable // mid
-
-        if lines >= n:
-            start = mid + 1
-        elif lines < n:
+        num_of_lan = cut_lan(mid)
+        if num_of_lan < n:
             end = mid - 1
+        elif num_of_lan >= n:
+            start = mid + 1
+    return end
 
-    print(end)
 
-if __name__ == "__main__":
+def main():
+    stdin = open('./input.txt', 'r')
+    global k, n, lans
+    lans = []
+    k, n = map(int, stdin.readline().split())
+
+    for _ in range(k):
+        lans.append(int(stdin.readline()))
+    lans.sort()
+
+    print(binary_search())
+
+
+if __name__ == '__main__':
     main()
