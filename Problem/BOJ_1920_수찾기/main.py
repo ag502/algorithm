@@ -1,33 +1,34 @@
 from sys import stdin
 
+origin_numbers = None
 
-def binary_search(array, target):
-    start = 0
-    end = len(array) - 1
 
-    while start <= end:
-        mid = (start + end) // 2
-        if array[mid] == target:
-            return 1
-        elif array[mid] < target:
-            start = mid + 1
-        elif array[mid] > target:
-            end = mid - 1
-    return 0
+def binary_search(target_number, start, end):
+    if start > end:
+        return 0
+    mid = (start + end) // 2
+    if target_number == origin_numbers[mid]:
+        return 1
+    elif target_number > origin_numbers[mid]:
+        return binary_search(target_number, mid + 1, end)
+    else:
+        return binary_search(target_number, start, mid - 1)
 
 
 def main():
-    n = int(stdin.readline())
-    num_list = sorted(list(map(int, stdin.readline().split())))
-    m = int(stdin.readline())
-    find_num_list = list(map(int, stdin.readline().split()))
+    global origin_numbers
+    stdin = open("./input.txt")
 
-    for number in find_num_list:
-        if binary_search(num_list, number) == 1:
-            print(1)
-        else:
-            print(0)
+    num_of_numbers = int(stdin.readline())
+    origin_numbers = list(map(int, stdin.readline().split()))
+    origin_numbers.sort()
+
+    num_of_target_nums = int(stdin.readline())
+    target_numbers = list(map(int, stdin.readline().split()))
+
+    for target_num in target_numbers:
+        print(binary_search(target_num, 0, len(origin_numbers) - 1))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
