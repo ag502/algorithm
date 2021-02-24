@@ -1,142 +1,129 @@
 from sys import stdin
+from copy import deepcopy
+from itertools import product
+
+directions = ['N', 'S', 'E', 'W']
 
 
-def rotate(camera_type, cur_row, cur_col):
-    areas = [0, 0, 0, 0]
+def mark(type, cur_row, cur_col):
+    if type == 1:
+        for row in range(cur_row, -1, -1):
+            if temp_office[row][cur_col] == '0':
+                temp_office[row][cur_col] = '#'
+            elif temp_office[row][cur_col] == '6':
+                break
+    elif type == 2:
+        for col in range(cur_col, cols):
+            if temp_office[cur_row][col] == '0':
+                temp_office[cur_row][col] = '#'
+            elif temp_office[cur_row][col] == '6':
+                break
+    elif type == 3:
+        for row in range(cur_row, rows):
+            if temp_office[row][cur_col] == '0':
+                temp_office[row][cur_col] = '#'
+            elif temp_office[row][cur_col] == '6':
+                break
+    elif type == 4:
+        for col in range(cur_col, -1, -1):
+            if temp_office[cur_row][col] == '0':
+                temp_office[cur_row][col] = '#'
+            elif temp_office[cur_row][col] == '6':
+                break
 
-    for row in range(cur_row - 1, -1, -1):
-        if office[row][cur_col] == '6':
-            break
-        elif office[row][cur_col] == '0' or office[row][cur_col] == "#":
-            areas[0] += 1
 
-    for col in range(cur_col + 1, cols):
-        if office[cur_row][col] == '6':
-            break
-        elif office[cur_row][col] == '0' or office[cur_row][col] == "#":
-            areas[1] += 1
-
-    for row in range(cur_row + 1, rows):
-        if office[row][cur_col] == '6':
-            break
-        elif office[row][cur_col] == '0' or office[row][cur_col] == "#":
-            areas[2] += 1
-
-    for col in range(cur_col - 1, -1, -1):
-        if office[cur_row][col] == '6':
-            break
-        elif office[cur_row][col] == '0' or office[cur_row][col] == "#":
-            areas[3] += 1
-
-    print(areas)
-    direction = ''
+def rotate(camera_info, direction):
+    camera_type, cur_row, cur_col = camera_info
     if camera_type == '1':
-        temp = 0
-        for idx, area in enumerate(areas):
-            if temp < area:
-                temp = area
-                if idx == 0:
-                    direction = 'N'
-                elif idx == 1:
-                    direction = 'E'
-                elif idx == 2:
-                    direction = 'S'
-                else:
-                    direction = 'W'
-    elif camera_type == '2':
-        if areas[0] + areas[2] < areas[1] + areas[3]:
-            direction = 'WE'
+        if direction == 'N':
+            mark(1, cur_row, cur_col)
+        elif direction == 'E':
+            mark(2, cur_row, cur_col)
+        elif direction == 'S':
+            mark(3, cur_row, cur_col)
         else:
-            direction = 'NS'
+            mark(4, cur_row, cur_col)
+
+    elif camera_type == '2':
+        if direction == 'W' or direction == 'E':
+            mark(4, cur_row, cur_col)
+            mark(2, cur_row, cur_col)
+        else:
+            mark(1, cur_row, cur_col)
+            mark(3, cur_row, cur_col)
+
     elif camera_type == '3':
-        comb_areas = [areas[0] + areas[1], areas[1] + areas[2], areas[2] + areas[3], areas[3] + areas[0]]
-        temp = 0
-        for idx, comb_area in enumerate(comb_areas):
-            if temp < comb_area:
-                temp = comb_area
-                if idx == 0:
-                    direction = 'NE'
-                elif idx == 1:
-                    direction = 'ES'
-                elif idx == 2:
-                    direction = 'WS'
-                else:
-                    direction = 'WN'
+        if direction == 'N':
+            mark(1, cur_row, cur_col)
+            mark(2, cur_row, cur_col)
+        elif direction == "E":
+            mark(2, cur_row, cur_col)
+            mark(3, cur_row, cur_col)
+
+        elif direction == 'S':
+            mark(3, cur_row, cur_col)
+            mark(4, cur_row, cur_col)
+        else:
+            mark(4, cur_row, cur_col)
+            mark(1, cur_row, cur_col)
+
     elif camera_type == '4':
-        comb_areas = [
-            areas[3] + areas[0] + areas[1],
-            areas[0] + areas[1] + areas[2],
-            areas[1] + areas[2] + areas[3],
-            areas[2] + areas[3] + areas[0]
-        ]
-        temp = 0
-        for idx, comb_area in enumerate(comb_areas):
-            if temp < comb_area:
-                temp = comb_area
-                if idx == 0:
-                    direction = 'WNE'
-                elif idx == 1:
-                    direction = 'NES'
-                elif idx == 2:
-                    direction = 'ESW'
-                else:
-                    direction = 'SWN'
+        if direction == 'N':
+            mark(4, cur_row, cur_col)
+            mark(1, cur_row, cur_col)
+            mark(2, cur_row, cur_col)
+        elif direction == 'E':
+            mark(1, cur_row, cur_col)
+            mark(2, cur_row, cur_col)
+            mark(3, cur_row, cur_col)
+        elif direction == 'S':
+            mark(2, cur_row, cur_col)
+            mark(3, cur_row, cur_col)
+            mark(4, cur_row, cur_col)
+        else:
+            mark(3, cur_row, cur_col)
+            mark(4, cur_row, cur_col)
+            mark(1, cur_row, cur_col)
     else:
-        direction = 'NESW'
-    return direction
-
-
-def mark(direction, cur_row, cur_col):
-    if direction == 'N':
-        for row in range(cur_row - 1, -1, -1):
-            if office[row][cur_col] == '6':
-                break
-            elif office[row][cur_col] == '0':
-                office[row][cur_col] = '#'
-    elif direction == 'E':
-        for col in range(cur_col + 1, cols):
-            if office[cur_row][col] == '6':
-                break
-            elif office[cur_row][col] == '0':
-                office[cur_row][col] = '#'
-    elif direction == 'S':
-        for row in range(cur_row + 1, rows):
-            if office[row][cur_col] == '6':
-                break
-            elif office[row][cur_col] == '0':
-                office[row][cur_col] = '#'
-    elif direction == 'W':
-        for col in range(cur_col - 1, -1, -1):
-            if office[cur_row][col] == '6':
-                break
-            elif office[cur_row][col] == '0':
-                office[cur_row][col] = '#'
-
-
-def mark_office(camera_type, cur_row, cur_col):
-    direction = rotate(camera_type, cur_row, cur_col)
-    print(direction)
-    for way in direction:
-        mark(way, cur_row, cur_col)
+        mark(1, cur_row, cur_col)
+        mark(2, cur_row, cur_col)
+        mark(3, cur_row, cur_col)
+        mark(4, cur_row, cur_col)
 
 
 def main():
     stdin = open("./input.txt", "r")
-    global rows, cols, office
-
+    global rows, cols, office, temp_office, cameras, visited
     rows, cols = map(int, stdin.readline().split())
+
     office = []
-
     for _ in range(rows):
-        office.append(stdin.readline().split())
+        office.append(list(stdin.readline().rstrip().split()))
 
+    # print(office)
+    cameras = []
     for row in range(rows):
         for col in range(cols):
-            if office[row][col] in ['1', '2', '3', '4', '5']:
-                mark_office(office[row][col], row, col)
+            if office[row][col] != '0' and office[row][col] != '6':
+                cameras.append((office[row][col], row, col))
 
-    for row in office:
-        print(row)
+    comb_dir = list(product(directions, repeat=len(cameras)))
+
+    answer = []
+    for idx, direction in enumerate(comb_dir):
+        temp_office = deepcopy(office)
+        temp = 0
+        for dir, camera_info in zip(direction, cameras):
+            rotate(camera_info, dir)
+
+        for row in range(rows):
+            for col in range(cols):
+                if temp_office[row][col] == '0':
+                    temp += 1
+
+        answer.append(temp)
+
+    print(min(answer))
 
 
 if __name__ == '__main__':
