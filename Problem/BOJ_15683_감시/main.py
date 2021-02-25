@@ -1,129 +1,114 @@
-from sys import stdin
+from sys import stdin, maxsize
 from copy import deepcopy
-from itertools import product
-
-directions = ['N', 'S', 'E', 'W']
 
 
-def mark(type, cur_row, cur_col):
-    if type == 1:
+stdin = open("./input.txt", "r")
+rows, cols = map(int, stdin.readline().split())
+
+camera_info = []
+office = []
+
+for _ in range(rows):
+    office.append(stdin.readline().rstrip().split())
+# temp_office = deepcopy(office)
+answer = [maxsize]
+
+
+def array_copy(array1, array2):
+    for row in range(rows):
+        for col in range(cols):
+            array1[row][col] = array2[row][col]
+
+
+def rotate(direction, cur_row, cur_col):
+    if direction == 0:
         for row in range(cur_row, -1, -1):
-            if temp_office[row][cur_col] == '0':
-                temp_office[row][cur_col] = '#'
-            elif temp_office[row][cur_col] == '6':
+            if office[row][cur_col] == "6":
                 break
-    elif type == 2:
+            if office[row][cur_col] == "0":
+                office[row][cur_col] = "#"
+    elif direction == 1:
         for col in range(cur_col, cols):
-            if temp_office[cur_row][col] == '0':
-                temp_office[cur_row][col] = '#'
-            elif temp_office[cur_row][col] == '6':
+            if office[cur_row][col] == "6":
                 break
-    elif type == 3:
+            if office[cur_row][col] == "0":
+                office[cur_row][col] = "#"
+    elif direction == 2:
         for row in range(cur_row, rows):
-            if temp_office[row][cur_col] == '0':
-                temp_office[row][cur_col] = '#'
-            elif temp_office[row][cur_col] == '6':
+            if office[row][cur_col] == "6":
                 break
-    elif type == 4:
+            if office[row][cur_col] == "0":
+                office[row][cur_col] = "#"
+    elif direction == 3:
         for col in range(cur_col, -1, -1):
-            if temp_office[cur_row][col] == '0':
-                temp_office[cur_row][col] = '#'
-            elif temp_office[cur_row][col] == '6':
+            if office[cur_row][col] == "6":
                 break
+            if office[cur_row][col] == "0":
+                office[cur_row][col] = "#"
 
 
-def rotate(camera_info, direction):
-    camera_type, cur_row, cur_col = camera_info
-    if camera_type == '1':
-        if direction == 'N':
-            mark(1, cur_row, cur_col)
-        elif direction == 'E':
-            mark(2, cur_row, cur_col)
-        elif direction == 'S':
-            mark(3, cur_row, cur_col)
-        else:
-            mark(4, cur_row, cur_col)
+def dfs(idx):
 
-    elif camera_type == '2':
-        if direction == 'W' or direction == 'E':
-            mark(4, cur_row, cur_col)
-            mark(2, cur_row, cur_col)
-        else:
-            mark(1, cur_row, cur_col)
-            mark(3, cur_row, cur_col)
+    if idx >= len(camera_info):
+        # for row in office:
+        #     print(row)
+        # print("---------------------")
+        count = 0
+        for row in range(rows):
+            for col in range(cols):
+                if office[row][col] == "0":
+                    count += 1
+        answer[0] = min(answer[0], count)
+        return
 
-    elif camera_type == '3':
-        if direction == 'N':
-            mark(1, cur_row, cur_col)
-            mark(2, cur_row, cur_col)
-        elif direction == "E":
-            mark(2, cur_row, cur_col)
-            mark(3, cur_row, cur_col)
+    temp_office = [['0'] * cols for _ in range(rows)]
+    array_copy(temp_office, office)
 
-        elif direction == 'S':
-            mark(3, cur_row, cur_col)
-            mark(4, cur_row, cur_col)
-        else:
-            mark(4, cur_row, cur_col)
-            mark(1, cur_row, cur_col)
-
-    elif camera_type == '4':
-        if direction == 'N':
-            mark(4, cur_row, cur_col)
-            mark(1, cur_row, cur_col)
-            mark(2, cur_row, cur_col)
-        elif direction == 'E':
-            mark(1, cur_row, cur_col)
-            mark(2, cur_row, cur_col)
-            mark(3, cur_row, cur_col)
-        elif direction == 'S':
-            mark(2, cur_row, cur_col)
-            mark(3, cur_row, cur_col)
-            mark(4, cur_row, cur_col)
-        else:
-            mark(3, cur_row, cur_col)
-            mark(4, cur_row, cur_col)
-            mark(1, cur_row, cur_col)
+    # if idx < len(camera_info):
+    camera_type, cur_row, cur_col = camera_info[idx]
+    if camera_type == "1":
+        for direction in range(4):
+            rotate(direction, cur_row, cur_col)
+            dfs(idx + 1)
+            array_copy(office, temp_office)
+    elif camera_type == "2":
+        for direction in range(2):
+            rotate(direction, cur_row, cur_col)
+            rotate(direction + 2, cur_row, cur_col)
+            dfs(idx + 1)
+            array_copy(office, temp_office)
+    elif camera_type == "3":
+        for direction in range(4):
+            rotate(direction, cur_row, cur_col)
+            rotate((direction + 1) % 4, cur_row, cur_col)
+            dfs(idx + 1)
+            array_copy(office, temp_office)
+    elif camera_type == "4":
+        for direction in range(4):
+            rotate(direction, cur_row, cur_col)
+            rotate((direction + 1) % 4, cur_row, cur_col)
+            rotate((direction + 2) % 4, cur_row, cur_col)
+            dfs(idx + 1)
+            array_copy(office, temp_office)
     else:
-        mark(1, cur_row, cur_col)
-        mark(2, cur_row, cur_col)
-        mark(3, cur_row, cur_col)
-        mark(4, cur_row, cur_col)
+        for direction in range(4):
+            rotate(direction, cur_row, cur_col)
+        dfs(idx + 1)
+        array_copy(office, temp_office)
+
+    # array_copy(office, temp_office)
 
 
 def main():
-    stdin = open("./input.txt", "r")
-    global rows, cols, office, temp_office, cameras, visited
-    rows, cols = map(int, stdin.readline().split())
-
-    office = []
-    for _ in range(rows):
-        office.append(list(stdin.readline().rstrip().split()))
-
-    # print(office)
-    cameras = []
     for row in range(rows):
         for col in range(cols):
-            if office[row][col] != '0' and office[row][col] != '6':
-                cameras.append((office[row][col], row, col))
+            if office[row][col] != "6" and office[row][col] != "0":
+                camera_info.append([office[row][col], row, col])
 
-    comb_dir = list(product(directions, repeat=len(cameras)))
+    # print(camera_info)
+    dfs(0)
 
-    answer = []
-    for idx, direction in enumerate(comb_dir):
-        temp_office = deepcopy(office)
-        temp = 0
-        for dir, camera_info in zip(direction, cameras):
-            rotate(camera_info, dir)
-
-        for row in range(rows):
-            for col in range(cols):
-                if temp_office[row][col] == '0':
-                    temp += 1
-
-        answer.append(temp)
-
-    print(min(answer))
+    print(answer[0])
 
 
 if __name__ == '__main__':
