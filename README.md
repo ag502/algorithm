@@ -1,5 +1,5 @@
 # Algorithm
 
-It's for algorithm study!!!
+It's for algorithm study!!
 
-`python` `javascript` `java`
+`Python` `JavaScript` `Java`
