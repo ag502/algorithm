@@ -1,15 +1,18 @@
 from sys import stdin
 from heapq import heappush, heappop
 
-moving_dir = [[-1, 0], [0, 1], [1, 0], [0, -1]]
 
-def bfs(cage, width):
-    dist = [[float('inf')] * width for _ in range(width)]
+moving_dir = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+
+
+def dijkstra():
     pq = []
+    visited = [[False] * cave_size for _ in range(cave_size)]
+    dist = [[float("inf")] * cave_size for _ in range(cave_size)]
+    dist[0][0] = cave[0][0]
 
-    dist[0][0] = cage[0][0]
-    heappush(pq, [cage[0][0], 0, 0])
-    cage[0][0] = -1
+    heappush(pq, [dist[0][0], 0, 0])
+    visited[0][0] = True
 
     while len(pq) != 0:
         cur_dist, cur_row, cur_col = heappop(pq)
@@ -20,33 +23,32 @@ def bfs(cage, width):
         for moving_row, moving_col in moving_dir:
             next_row = cur_row + moving_row
             next_col = cur_col + moving_col
-            if 0 <= next_row < width and 0 <= next_col < width:
-                if cage[next_row][next_col] != -1:
-                    dist[next_row][next_col] = min(dist[next_row][next_col], dist[cur_row][cur_col] + cage[next_row][next_col])
-                    heappush(pq, [dist[cur_row][cur_col] + cage[next_row][next_col], next_row, next_col])
-                    cage[next_row][next_col] = -1
+            if 0 <= next_row < cave_size and 0 <= next_col < cave_size and not visited[next_row][next_col]:
+                if dist[next_row][next_col] > cur_dist + cave[next_row][next_col]:
+                    dist[next_row][next_col] = cur_dist + cave[next_row][next_col]
+                    heappush(pq, [dist[next_row][next_col], next_row, next_col])
 
-    return dist
+    return dist[cave_size - 1][cave_size - 1]
+
 
 def main():
-    stdin = open('./test_case.txt', 'r')
-    answer = []
-    while True:
-        width = int(stdin.readline())
-        cage = []
+    stdin = open("./input.txt", "r")
+    global cave, cave_size
 
-        if width == 0:
+    phase = 0
+    while True:
+        phase += 1
+        cave_size = int(stdin.readline().rstrip())
+
+        if cave_size == 0:
             break
 
-        for _ in range(width):
-            row = list(map(int, stdin.readline().split()))
-            cage.append(row)
+        cave = []
+        for _ in range(cave_size):
+            cave.append(list(map(int, stdin.readline().split())))
 
-        dist = bfs(cage, width)
-        answer.append(dist[width - 1][width - 1])
+        print("Problem {}: {}".format(phase, dijkstra()))
 
-    for idx, money in enumerate(answer):
-        print('Problem ' + str(idx + 1) + ': ' + str(money))
 
 if __name__ == '__main__':
     main()
