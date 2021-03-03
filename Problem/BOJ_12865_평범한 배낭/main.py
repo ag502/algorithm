@@ -1,21 +1,28 @@
 from sys import stdin
 
+MAX_WEIGHT = 100000
+
+
 def main():
-    n, k = list(map(int, stdin.readline().split()))
-    cache = [[0] * (k + 1) for _ in range(0, n + 1)]
+    stdin = open("./input.txt", "r")
+    num_of_items, target_weight = map(int, stdin.readline().split())
+    items = [(0, 0)]
 
-    bag_objects = []
-    for i in range(n):
-        w, v = list(map(int, stdin.readline().split()))
-        bag_objects.append((w, v))
+    for _ in range(num_of_items):
+        items.append(tuple(map(int, stdin.readline().split())))
+    items.sort(key=lambda x: (x[0], x[1]))
 
-    for i in range(len(bag_objects)):
-        for max_weight in range(1, k + 1):
-            if max_weight < bag_objects[i][0]:
-                cache[i + 1][max_weight] = cache[i][max_weight]
-                continue
-            cache[i + 1][max_weight] = max(cache[i][max_weight], cache[i][max_weight - bag_objects[i][0]] + bag_objects[i][1])
-    print(cache[n][k])
+    dp = [[0] * (target_weight + 1) for _ in range(num_of_items + 1)]
 
-if __name__ == "__main__":
+    for num_of_item in range(1, num_of_items + 1):
+        for weight in range(1, target_weight + 1):
+            temp = 0
+            if weight >= items[num_of_item][0]:
+                temp = dp[num_of_item - 1][weight - items[num_of_item][0]] + items[num_of_item][1]
+            dp[num_of_item][weight] = max(dp[num_of_item - 1][weight], temp)
+
+    print(dp[num_of_item][weight])
+
+
+if __name__ == '__main__':
     main()
