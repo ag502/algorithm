@@ -1,26 +1,26 @@
-from sys import stdin
+from sys import stdin, maxsize
 
 
 def main():
-    N = int(stdin.readline())
-    sum_of_power = [0] * (N + 1)
+    stdin = open("Problem/BOJ_1699_제곱수의 합/input.txt", "r")
+    target_number = int(stdin.readline())
+    
+    dp = [maxsize] * (target_number + 1)
 
-    for i in range(2, int(N ** 0.5) + 1):
-        power = i ** 2
-        for j in range(1, (N // power) + 1):
-            if sum_of_power[power * j] == 0:
-                sum_of_power[power * j] = j
-            else:
-                sum_of_power[power * j] = min(sum_of_power[power * j], j)
-
-    sum_of_power[1] = 1
-    for index in range(2, N + 1):
-        if sum_of_power[index] == 0:
-            sum_of_power[index] = sum_of_power[index - 1] + 1
-        else:
-            continue
-    print(sum_of_power)
-
-
+    cur_num = 1
+    while True:
+        cur_mul_num = cur_num ** 2
+        if cur_mul_num > target_number:
+            break
+        
+        dp[cur_mul_num] = min(dp[cur_mul_num], 1)
+        
+        for next_num in range(cur_mul_num + 1, target_number + 1):
+            dp[next_num] = min(dp[next_num - cur_mul_num] + 1, dp[next_num])
+            
+        cur_num += 1
+    
+    print(dp[target_number])
+    
 if __name__ == "__main__":
     main()
