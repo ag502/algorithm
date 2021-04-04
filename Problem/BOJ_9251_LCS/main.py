@@ -2,34 +2,26 @@ from sys import stdin
 
 
 def main():
-    S1 = stdin.readline().rstrip()
-    S2 = stdin.readline().rstrip()
+    stdin = open("./input.txt", "r")
+    string1 = stdin.readline().rstrip()
+    string2 = stdin.readline().rstrip()
 
-    S1_list = list(S1)
-    S2_list = list(S2)
+    dp = [[0] * (len(string2) + 1) for _ in range(len(string1) + 1)]
 
-    cache = [0] * len(S2_list)
+    for string1_idx in range(1, len(string1) + 1):
+        for string2_idx in range(1, len(string2) + 1):
+            if string1[string1_idx - 1] == string2[string2_idx - 1]:
+                dp[string1_idx][string2_idx] = dp[string1_idx - 1][string2_idx - 1] + 1
+            else:
+                dp[string1_idx][string2_idx] = max(dp[string1_idx - 1][string2_idx], dp[string1_idx][string2_idx - 1])
 
-    prev_alphabet = ''
+    # print(dp)
+    answer = 0
+    for row in dp:
+        answer = max(answer, max(row))
 
-    for i in range(len(S1_list)):
-        target_alphabet = S1_list[i]
-        max_length = 0
-        is_in = False
-        for j in range(len(S2_list)):
-            if S2_list[j] == prev_alphabet:
-                if max_length < cache[j]:
-                    max_length = cache[j]
-            if S2_list[j] == target_alphabet:
-                is_in = True
-                cache[j] = max(cache[j], max_length + 1)
-                # max_length = 0
-        if is_in:
-            prev_alphabet = target_alphabet
-
-    # print(max(cache))
-    print(cache)
+    print(answer)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
