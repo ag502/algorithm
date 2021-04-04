@@ -1,18 +1,21 @@
 from sys import stdin
-import heapq
+from heapq import heappush, heappop
 
 def main():
-    num_of_number = int(stdin.readline())
+    stdin = open("Problem/BOJ_11279_최대 힙/input.txt")
+    n = int(stdin.readline())
+    
     heap = []
-    for _ in range(num_of_number):
-        input_number = int(stdin.readline())
-        if input_number == 0:
-            if len(heap) == 0:
+    for _ in range(n):
+        x = int(stdin.readline())
+        if x == 0:
+            if not heap:
                 print(0)
             else:
-                print(heapq.heappop(heap)[1])
+                print(-heappop(heap))
         else:
-            heapq.heappush(heap, (-input_number, input_number))
+            heappush(heap, -x)
+            
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

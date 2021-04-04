@@ -1,40 +1,33 @@
 from sys import stdin
 from collections import deque
 
+
 def main():
-    num_of_antenna = int(stdin.readline())
-    antenna_list = list(map(int, stdin.readline().split()))
-    received_top = [0] * len(antenna_list)
-
+    stdin = open("Problem/BOJ_2493_탑/input.txt")
+    num_of_towers = int(stdin.readline())
+    tower_heights = list(map(int, stdin.readline().split()))
+    answer = [0] * num_of_towers
+    
+    tower_number = {}
+    for idx, height in enumerate(tower_heights):
+        tower_number[height] = idx + 1
+    
     stack = deque()
-    stack.appendleft((1, antenna_list[0]))
-
-
-    for idx in range(1, len(antenna_list)):
-        top = stack[0]
-        if top[1] > antenna_list[idx]:
-            received_top[idx] = top[0]
-            stack.appendleft((idx + 1, antenna_list[idx]))
-        else:
-            while True:
-                stack.popleft()
-                if len(stack) == 0:
-                    stack.appendleft((idx + 1, antenna_list[idx]))
+    stack.append(tower_heights[0])
+    for idx, height in enumerate(tower_heights[1:]):
+        while True:
+            top = stack[len(stack) - 1]
+            if top >= height:
+                answer[idx + 1] = tower_number[top]
+                stack.append(height)
+                break
+            else:
+                stack.pop()
+                if not stack:
+                    stack.append(height)
                     break
-                else:
-                    top = stack[0]
-                    if top[1] <= antenna_list[idx]:
-                        continue
-                    else:
-                        stack.appendleft((idx + 1, antenna_list[idx]))
-                        received_top[idx] = top[0]
-                        break
-
-    answer_str = ''
-    for top_num in received_top:
-        answer_str += str(top_num) + ' '
-    print(answer_str.strip())
-
-if __name__ == '__main__':
+    
+    print(' '.join(map(str,answer)))
+    
+if __name__ == "__main__":
     main()
-
