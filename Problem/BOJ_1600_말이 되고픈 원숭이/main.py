@@ -1,64 +1,59 @@
 from sys import stdin
 from collections import deque
 
-monkey_moving = [[1, 0], [-1, 0], [0, 1], [0, -1]]
-horse_moving = [[-2, 1], [-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1]]
+moving_monkey = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+moving_horse = [[-2, 1], [-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1]]
+
+stdin = open("./input.txt", "r")
+k = int(stdin.readline())
+cols, rows = map(int, stdin.readline().split())
+grid = []
+
+for _ in range(rows):
+    grid.append(stdin.readline().split())
+
+visited = [[[False] * cols for _ in range(rows)] for _ in range(k + 1)]
 
 
-def bfs(board, rows, cols, cur_row, cur_col, max_horse_moving_count):
+def bfs():
     queue = deque()
-    queue.append([max_horse_moving_count, cur_row, cur_col])
-    board[cur_row][cur_col] = -1
+    queue.append((0, 0, 0))
+    visited[0][0][0] = True
 
-    moving_count = 0
-    while len(queue) != 0:
+    distance = -1
+    while queue:
         size = len(queue)
+        distance += 1
         for _ in range(size):
-            horse_moving_count, cur_row, cur_col = queue.popleft()
-            print(horse_moving_count, cur_row, cur_col)
+            cur_row, cur_col, horse_count = queue.popleft()
+            # print(cur_row, cur_col, horse_count)
 
             if cur_row == rows - 1 and cur_col == cols - 1:
-                return moving_count
+                return distance
 
-            for moving_row, moving_col in monkey_moving:
-                next_row = cur_row + moving_row
-                next_col = cur_col + moving_col
+            for monkey_row, monkey_col in moving_monkey:
+                next_row = cur_row + monkey_row
+                next_col = cur_col + monkey_col
                 if 0 <= next_row < rows and 0 <= next_col < cols:
-                    if board[next_row][next_col] == 0:
-                        queue.append([horse_moving_count, next_row, next_col])
-                        board[next_row][next_col] = -1
+                    if not visited[horse_count][next_row][next_col] and grid[next_row][next_col] == "0":
+                        queue.append((next_row, next_col, horse_count))
+                        visited[horse_count][next_row][next_col] = True
 
-            if horse_moving_count > 0:
-                for moving_row, moving_col in horse_moving:
-                    next_row = cur_row + moving_row
-                    next_col = cur_col + moving_col
+            if horse_count < k:
+                for horse_row, horse_col in moving_horse:
+                    next_row = cur_row + horse_row
+                    next_col = cur_col + horse_col
                     if 0 <= next_row < rows and 0 <= next_col < cols:
-                        if board[next_row][next_col] == 0:
-                            queue.append([horse_moving_count - 1, next_row, next_col])
-                            board[next_row][next_col] = -1
+                        if not visited[horse_count + 1][next_row][next_col] and grid[next_row][next_col] == "0":
+                            queue.append((next_row, next_col, horse_count + 1))
+                            visited[horse_count + 1][next_row][next_col] = True
 
-        moving_count += 1
-    return -1
+    return -2
 
 
 def main():
-    stdin = open('./input.txt', 'r')
-    horse_move_count = int(stdin.readline())
-    cols, rows = map(int, stdin.readline().split())
-
-    board = []
-    for _ in range(rows):
-        row = list(map(int, stdin.readline().split()))
-        board.append(row)
-
-    # print(board)
-
-    distance = bfs(board, rows, cols, 0, 0, horse_move_count)
-
-    for row in range(rows):
-        print(board[row])
-
-    print(distance)
+    distance = bfs()
+    print(-1 if distance == -2 else distance)
 
 
 if __name__ == '__main__':
