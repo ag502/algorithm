@@ -1,29 +1,30 @@
 from sys import stdin
 
+
 def main():
     stdin = open('./input.txt', 'r')
-    n = int(stdin.readline())
-    m = int(stdin.readline())
-    array = list(map(int, stdin.readline().split()))
+    num_of_gradient = int(stdin.readline())
+    target_number = int(stdin.readline())
+    gradient = list(map(int, stdin.readline().split()))
 
-    array.sort()
+    gradient.sort()
 
-    num_of_armor = 0
     start = 0
-    end = len(array) - 1
-
+    end = len(gradient) - 1
+    answer = 0
     while start < end:
-        sum_of_gradient = array[start] + array[end]
-        if sum_of_gradient < m:
+        cur_target = gradient[start] + gradient[end]
+        if target_number > cur_target:
             start += 1
-        elif sum_of_gradient > m:
+        elif target_number < cur_target:
             end -= 1
         else:
-            num_of_armor += 1
+            answer += 1
             start += 1
             end -= 1
 
-    print(num_of_armor)
+    print(answer)
+
 
 if __name__ == '__main__':
     main()
