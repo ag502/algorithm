@@ -10,16 +10,31 @@ for _ in range(num_of_eggs):
 
 
 def dfs(egg1, egg2):
-    if egg1 != 0 and egg2 != 0:
-        egg1_info = eggs[egg1]
-        egg2_info = eggs[egg2]
-        egg1_info[0] -= egg2_info[1]
-        egg2_info[0] -= egg1_info[0]
+    egg1_origin_info = eggs[egg1][:]
+    egg2_origin_info = eggs[egg2][:]
+    print(egg1, egg2)
 
-    for next_egg2 in range(num_of_eggs):
-        dfs(egg1 + 1, next_egg2)
+    eggs[egg1][0] -= eggs[egg2][1]
+    eggs[egg2][0] -= eggs[egg1][1]
+
+    for next_egg1 in range(egg1 + 1, num_of_eggs):
+        if eggs[next_egg1][0] > 0:
+            for next_egg2 in range(num_of_eggs):
+                if eggs[next_egg2][0] > 0 and next_egg1 != next_egg2:
+                    dfs(next_egg1, next_egg2)
+
+    # if egg1 == num_of_eggs - 1:
+    #     print(eggs)
+    print(eggs)
+    eggs[egg1] = egg1_origin_info
+    eggs[egg2] = egg2_origin_info
 
 
 def main():
-    pass
+    for egg2 in range(1, num_of_eggs):
+        dfs(0, egg2)
+
+
+if __name__ == '__main__':
+    main()
 
