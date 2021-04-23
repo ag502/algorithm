@@ -46,7 +46,7 @@ def main():
     tree_height = list(map(int, stdin.readline().split()))
 
     start = 0
-    end = 1000000000
+    end = max(tree_height)
 
     while start <= end:
         mid = (start + end) // 2

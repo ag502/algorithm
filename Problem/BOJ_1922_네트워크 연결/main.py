@@ -1,41 +1,45 @@
 from sys import stdin
 
+
 stdin = open("./input.txt", "r")
-num_of_computers = int(stdin.readline())
+num_of_computer = int(stdin.readline())
 num_of_relations = int(stdin.readline())
 
 edges = []
+
 for _ in range(num_of_relations):
-    pc_1, pc_2, cost = map(int, stdin.readline().split())
-    edges.append((pc_1, pc_2, cost))
+    computer1, computer2, cost = map(int, stdin.readline().split())
+    edges.append((computer1, computer2, cost))
 
 edges.sort(key=lambda x: x[2])
-parents = [i for i in range(num_of_computers + 1)]
+parents = [i for i in range(num_of_computer + 1)]
 
 
-def find(computer):
-    if computer == parents[computer]:
-        return computer
-    parents[computer] = find(parents[computer])
-    return parents[computer]
+def find(cur_pc):
+    if cur_pc == parents[cur_pc]:
+        return cur_pc
+    parents[cur_pc] = find(parents[cur_pc])
+    return parents[cur_pc]
 
 
-def merge(computer_1, computer_2):
-    computer_1_parent = find(computer_1)
-    computer_2_parent = find(computer_2)
+def merge(pc1, pc2):
+    pc1_parent = find(pc1)
+    pc2_parent = find(pc2)
 
-    if computer_1_parent == computer_2_parent:
+    if pc1_parent == pc2_parent:
         return
-    parents[computer_2_parent] = computer_1_parent
+    parents[pc2_parent] = pc1_parent
 
 
 def main():
     answer = 0
-    for computer_1, computer_2, network_cost in edges:
-        if find(computer_1) == find(computer_2):
+    for pc1, pc2, cost in edges:
+        pc1_parent = find(pc1)
+        pc2_parent = find(pc2)
+        if pc1_parent == pc2_parent:
             continue
-        merge(computer_1, computer_2)
-        answer += network_cost
+        merge(pc1, pc2)
+        answer += cost
 
     print(answer)
 
