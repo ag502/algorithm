@@ -1,64 +1,45 @@
 from sys import stdin
 from collections import deque
 
+stdin = open("./input.txt", "r")
+num_of_computer = int(stdin.readline())
+num_of_relation = int(stdin.readline())
 
-def main():
-    num_of_computer = int(stdin.readline())
-    num_of_connection = int(stdin.readline())
+network = {}
 
-    a_matrix = [[0] * (num_of_computer + 1)
-                for _ in range(num_of_computer + 1)]
+for computer in range(1, num_of_computer + 1):
+    network[computer] = []
 
-    for _ in range(num_of_connection):
-        vx_1, vx_2 = map(int, stdin.readline().split())
-        a_matrix[vx_1][vx_2] = 1
-        a_matrix[vx_2][vx_1] = 1
+for _ in range(num_of_relation):
+    computer1, computer2 = map(int, stdin.readline().split())
+    network[computer1].append(computer2)
+    network[computer2].append(computer1)
 
-    # is_visited = [-1] * (num_of_computer + 1)
-    # infected = []
-    # dfs(1, a_matrix, is_visited, infected)
-    # print(len(infected) - 1)
+visited = [False] * (num_of_computer + 1)
 
-    is_visited = [-1] * (num_of_computer + 1)
-    infected = []
-    bfs(1, a_matrix, is_visited, infected)
-    print(len(infected) - 1)
+infected = 0
 
 
-def dfs(start, a_matrix, is_visited, infected):
-    # 1. 체크인
-    is_visited[start] = 0
-    # 2. 목적지?
-    infected.append(start)
-    # 3. 갈 수 있는 곳을 순회
-    for idx, vertex in enumerate(a_matrix[start][1:]):
-        # 4. 갈 수 있는 지 검사
-        if vertex == 1 and is_visited[idx + 1] == -1:
-            # 5. 간다
-            dfs(idx + 1, a_matrix, is_visited, infected)
-    # 4. 체크 아웃
-    is_visited[start] = 1
-
-
-def bfs(start, a_matrix, is_visited, infected):
+def bfs():
     queue = deque()
-    queue.append(start)
-    is_visited[start] = 0
+    queue.append(1)
+    visited[1] = True
 
     while queue:
-        # 1. 큐에서 꺼냄
-        current_vertex = queue.popleft()
-        # 2. 목적지
-        infected.append(current_vertex)
-        # 3. 갈 수 있는 곳을 순회
-        for idx, vertex in enumerate(a_matrix[current_vertex][1:]):
-            # 4. 갈 수 있는 지 검사
-            if vertex == 1 and is_visited[idx + 1] == -1:
-                # 5. 큐에 넣어 줌
-                queue.append(idx + 1)
-                is_visited[idx + 1] = 0
-        is_visited[current_vertex] = 1
+        global infected
+        cur_computer = queue.popleft()
+        infected += 1
+
+        for next_computer in network[cur_computer]:
+            if not visited[next_computer]:
+                visited[next_computer] = True
+                queue.append(next_computer)
 
 
-if __name__ == "__main__":
+def main():
+    bfs()
+    print(infected - 1)
+
+
+if __name__ == '__main__':
     main()
