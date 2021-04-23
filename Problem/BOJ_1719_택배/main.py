@@ -52,10 +52,12 @@ def main():
 
     for start_herb in herbs.keys():
         dist, parents = dijkstra(herbs, start_herb)
+        print(parents)
 
         for end_herb, distance in enumerate(dist):
             if end_herb != 0 and distance != 0:
                 path = shortest_path(parents, start_herb, end_herb)
+                print(path)
                 path_table[start_herb - 1][end_herb - 1] = str(path[1])
 
     for row in path_table:
