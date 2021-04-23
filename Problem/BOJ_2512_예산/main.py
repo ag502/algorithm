@@ -1,32 +1,35 @@
 from sys import stdin
 
 
-def main():
-    num_of_province = int(stdin.readline())
-    budgets = list(map(int, stdin.readline().split()))
-    total_budget = int(stdin.readline())
+def get_sum(money_list, standard):
+    money_sum = 0
+    for money in money_list:
+        if money > standard:
+            money_sum += standard
+        else:
+            money_sum += money
+    return money_sum
 
-    candidate_ceiling = []
+
+def main():
+    stdin = open("./input.txt", "r")
+    num_of_province = int(stdin.readline())
+    province_money = list(map(int, stdin.readline().split()))
+    maximum_money = int(stdin.readline())
 
     start = 0
-    end = max(budgets)
+    end = max(province_money)
 
     while start <= end:
         mid = (start + end) // 2
-        sum_of_budget = sum([budget if budget <=
-                             mid else mid for budget in budgets])
+        money_sum = get_sum(province_money, mid)
 
-        if sum_of_budget == total_budget:
-            print(mid)
-            return
-        elif sum_of_budget < total_budget:
-            candidate_ceiling.append(mid)
-            start = mid + 1
-        else:
+        if money_sum > maximum_money:
             end = mid - 1
+        else:
+            start = mid + 1
+    print(end)
 
-    print(max(candidate_ceiling))
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
