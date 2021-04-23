@@ -1,21 +1,21 @@
 from sys import stdin
 
+
 def main():
-    n = int(stdin.readline())
-    number_list = set()
+    stdin = open("./input.txt", "r")
+    target = int(stdin.readline())
 
-    i = 1
-    while True:
-        temp = n - i
-        if i < temp:
-            number_list.add(i)
-            n = temp
-            i += 1
-        else:
-            number_list.add(n)
-            break
+    count = 1
+    sum_of_num = 1
+    cur_num = 1
 
-    print(len(number_list))
+    while sum_of_num <= target:
+        cur_num += 1
+        sum_of_num += cur_num
+        count += 1
 
-if __name__ == "__main__":
+    print(count - 1)
+
+
+if __name__ == '__main__':
     main()
