@@ -1,32 +1,29 @@
 from sys import stdin
+from typing import List, Any
 
 
-def main():
-    N, M = map(int, stdin.readline().split())
+def main() -> None:
+    stdin = open("./input.txt", "r")
+    n: int
+    m: int
+    n, m = list(map(int, stdin.readline().split()))
+    visited: List[bool] = [False] * (n + 1)
 
-    for i in range(1, N + 1):
-        visited = [0] * (N + 1)
-        permutation(i, 0, N, M, [], visited)
+    def find_sequence(cur_num: int, sequence: List[int] = []) -> None:
+        sequence.append(cur_num)
+        visited[cur_num] = True
 
+        if len(sequence) < m:
+            for next_num in range(1, n + 1):
+                if not visited[next_num]:
+                    find_sequence(next_num, sequence)
+        elif len(sequence) == m:
+            print(' '.join(map(str, sequence)))
+        sequence.pop()
+        visited[cur_num] = False
 
-def permutation(cur_num, selected_num, n, m, answer, visited):
-    # 1. 방문
-    selected_num += 1
-    visited[cur_num] = -1
-    # 2. 도착
-    answer.append(cur_num)
-    # 3. 인접 노드 순회
-    for i in range(1, n + 1):
-        # 4. 갈 수 있는지 검사
-        if selected_num < m and visited[i] != -1 and i != cur_num:
-            # 5. 간다
-            permutation(i, selected_num, n, m, answer, visited)
-    # 5. 체크아웃
-    if len(answer) == m:
-        print(" ".join(map(str, answer)))
-    answer.pop()
-    selected_num -= 1
-    visited[cur_num] = 0
+    for start_num in range(1, n + 1):
+        find_sequence(start_num)
 
 
 if __name__ == "__main__":
