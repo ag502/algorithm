@@ -1,31 +1,28 @@
 from sys import stdin
+from typing import List
 
 
-def main():
-    N, M = map(int, stdin.readline().split())
+def find_sequence(cur_num: int, sequence: List[int], m: int, n: int) -> None:
+    sequence.append(cur_num)
 
-    for i in range(1, N + 1):
-        m_permutation(i, N, M, 0, [])
-
-
-def m_permutation(cur_num, n, m, selected_num, answer):
-    # 1. 체크인
-    selected_num += 1
-    # 2. 목적지
-    answer.append(str(cur_num))
-    # 3. 인접 노드 순회
-    for next_cur in range(1, n + 1):
-        # 4. 갈 수 있는지 검사
-        if selected_num != m:
-            # 5. 간다
-            m_permutation(next_cur, n, m, selected_num, answer)
-
-    # 6. 체크 아웃
-    if len(answer) == m:
-        print(' '.join(answer))
-    answer.pop()
-    selected_num -= 1
+    if len(sequence) < m:
+        for next_num in range(1, n + 1):
+            find_sequence(next_num, sequence, m, n)
+    elif len(sequence) == m:
+        print(' '.join(map(str, sequence)))
+    sequence.pop()
 
 
-if __name__ == "__main__":
+def main() -> None:
+    stdin = open("input.txt", "r")
+    n: int
+    m: int
+    n, m = list(map(int, stdin.readline().split()))
+    sequence: List[int] = []
+
+    for start_num in range(1, n + 1):
+        find_sequence(start_num, sequence, m, n)
+
+
+if __name__ == '__main__':
     main()
