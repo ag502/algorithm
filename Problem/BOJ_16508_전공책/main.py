@@ -3,70 +3,60 @@ from sys import stdin, maxsize
 
 class Main:
     def __init__(self):
-        self.target_string = ''
-        self.target_string_dict = {}
+        self.target_string = None
         self.num_of_book = 0
-        self.string = []
-        self.price = []
-        self.using_book = {}
+        self.all_title = []
         self.visited = []
-        self.total_price = maxsize
+        self.books = []
+        self.min_cost = maxsize
 
         self.main()
 
-    def find_char(self, cur_idx, word=[]):
-        cur_char_info = self.string[cur_idx]
-        word.append(cur_char_info[2])
-        self.using_book[cur_char_info[1]] += 1
+    def get_book_comb(self, cur_idx, count, target_number, acc_cost, acc_title=[]) -> None:
+        cur_price, cur_title = self.books[cur_idx]
         self.visited[cur_idx] = True
+        acc_cost += cur_price
+        acc_title.append(cur_title)
 
-        if len(word) < len(self.target_string):
-            for next_idx in range(len(self.string)):
-                next_char_info = self.string[next_idx]
-                if not self.visited[next_idx] and next_char_info[2] == self.target_string[len(word)]:
-                    self.find_char(next_idx, word)
-        elif len(word) == len(self.target_string):
-            # print(word)
-            # print(self.using_book)
-            temp = 0
-            for book, count in self.using_book.items():
-                if count != 0:
-                    temp += self.price[book]
-
-            if temp != 0:
-                self.total_price = min(self.total_price, temp)
-
-        word.pop()
-        self.using_book[cur_char_info[1]] -= 1
+        if count < target_number:
+            for next_idx in range(cur_idx + 1, self.num_of_book):
+                if not self.visited[next_idx]:
+                    self.get_book_comb(next_idx, count + 1, target_number, acc_cost, acc_title)
+        elif count == target_number:
+            self.all_title.append([acc_cost, ''.join(acc_title)])
         self.visited[cur_idx] = False
+        acc_title.pop()
 
-    def main(self):
+    def check_word(self):
+        for cost, book_title in self.all_title:
+            book_title = list(book_title)
+            for char in self.target_string:
+                try:
+                    idx = book_title.index(char)
+                    book_title[idx] = "_"
+                except:
+                    break
+
+            else:
+                self.min_cost = min(self.min_cost, cost)
+
+    def main(self) -> None:
         stdin = open("./input.txt", "r")
         self.target_string = stdin.readline().rstrip()
-
-        for idx, char in enumerate(self.target_string):
-            self.target_string_dict[char] = idx
-
         self.num_of_book = int(stdin.readline())
 
-        for idx in range(self.num_of_book):
+        for _ in range(self.num_of_book):
             price, title = stdin.readline().split()
-            self.using_book[idx] = 0
-            self.price.append(int(price))
-            for title_char in title:
-                if title_char in self.target_string:
-                    self.string.append([int(price), idx, title_char])
+            self.books.append([int(price), title])
 
-        self.visited = [False] * len(self.string)
-        self.string.sort(key=lambda x: x[1])
+        self.visited = [False] * self.num_of_book
 
-        for idx, char_info in enumerate(self.string):
-            if self.target_string[0] == char_info[2]:
-                self.find_char(idx)
-            else:
-                break
+        for count in range(1, self.num_of_book + 1):
+            for book in range(self.num_of_book):
+                self.get_book_comb(book, 1, count, 0)
 
-        print(-1 if self.total_price == maxsize else self.total_price)
+        self.check_word()
+        print(-1 if self.min_cost == maxsize else self.min_cost)
 
 
 if __name__ == '__main__':
