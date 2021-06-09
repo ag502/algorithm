@@ -1,44 +1,47 @@
 from sys import stdin
-from math import floor
 
 stdin = open("./input.txt", "r")
-
 num_of_student = int(stdin.readline())
-students = list(map(int, stdin.readline().split()))
-students.sort()
-answer = 0
-print(students)
+ability = list(map(int, stdin.readline().split()))
+ability.sort()
 
 
-def lower_bound(target, start, end, a, b):
-    global answer
-    while start <= end:
-        mid = (start + end) // 2
-        if target <= students[mid]:
-            if target == students[end]:
-                print(start, mid, end)
-                print(a, b, students[mid])
-                answer += 1
-            end = mid - 1
+def lower_bound(start_idx, target):
+    left_ptr = start_idx
+    right_ptr = len(ability) - 1
+
+    while left_ptr <= right_ptr:
+        mid = (left_ptr + right_ptr) // 2
+        if ability[mid] >= target:
+            right_ptr = mid - 1
         else:
-            start = mid + 1
+            left_ptr = mid + 1
 
-    if start < len(students) and target == students[start]:
-        print(start, mid, end)
-        print(students[start])
-        answer += 1
+    return left_ptr
+
+
+def upper_bound(start_idx, target):
+    left_ptr = start_idx
+    right_ptr = len(ability) - 1
+
+    while left_ptr <= right_ptr:
+        mid = (left_ptr + right_ptr) // 2
+        if ability[mid] > target:
+            right_ptr = mid - 1
+        else:
+            left_ptr = mid + 1
+    return left_ptr
 
 
 def main():
-    num_of_team = 0
-    for i in range(len(students) - 2):
-        for j in range(i + 1, len(students) - 1):
-            coding_score_1 = students[i]
-            coding_score_2 = students[j]
-            target = -(coding_score_1 + coding_score_2)
-            lower_bound(target, j + 1, len(students) - 1, coding_score_1, coding_score_2)
+    answer = 0
+    for first_student in range(len(ability) - 2):
+        for second_student in range(first_student + 1, len(ability) - 1):
+            sum_of_ability = ability[first_student] + ability[second_student]
+            idx_1 = lower_bound(second_student + 1, -sum_of_ability)
+            idx_2 = upper_bound(second_student + 1, -sum_of_ability)
 
-    print(num_of_team)
+            answer += (idx_2 - idx_1)
     print(answer)
 
 
