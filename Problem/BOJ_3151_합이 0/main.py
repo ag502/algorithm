@@ -8,29 +8,29 @@ ability.sort()
 
 def lower_bound(start_idx, target):
     left_ptr = start_idx
-    right_ptr = len(ability) - 1
+    right_ptr = len(ability)
 
-    while left_ptr <= right_ptr:
+    while left_ptr < right_ptr:
         mid = (left_ptr + right_ptr) // 2
         if ability[mid] >= target:
-            right_ptr = mid - 1
+            right_ptr = mid
         else:
             left_ptr = mid + 1
 
-    return left_ptr
+    return right_ptr
 
 
 def upper_bound(start_idx, target):
     left_ptr = start_idx
-    right_ptr = len(ability) - 1
+    right_ptr = len(ability)
 
-    while left_ptr <= right_ptr:
+    while left_ptr < right_ptr:
         mid = (left_ptr + right_ptr) // 2
         if ability[mid] > target:
-            right_ptr = mid - 1
+            right_ptr = mid
         else:
             left_ptr = mid + 1
-    return left_ptr
+    return right_ptr
 
 
 def main():
