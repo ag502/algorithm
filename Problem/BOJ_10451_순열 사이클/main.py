@@ -6,41 +6,49 @@ class Main:
     def __init__(self):
         self.length_of_seq = 0
         self.sequence = None
-        self.parent = None
+        self.graph = None
+        self.visited = None
+        self.finished = None
+        self.num_of_cycle = None
 
         self.main()
 
-    def find(self, cur_node):
-        if self.parent[cur_node] == cur_node:
-            return cur_node
-        self.parent[cur_node] = self.find(self.parent[cur_node])
-        return self.parent[cur_node]
+    def dfs(self, cur_node):
+        self.visited[cur_node] = True
 
-    def merge(self, node_1, node_2):
-        node_1_parent = self.find(node_1)
-        node_2_parent = self.find(node_2)
+        for next_node in self.graph[cur_node]:
+            if not self.visited[next_node]:
+                self.dfs(next_node)
 
-        if node_1_parent == node_2_parent:
-            return True
-        self.parent[node_2_parent] = node_1_parent
-        return False
+            if not self.finished[next_node]:
+                self.num_of_cycle += 1
+
+        self.finished[cur_node] = True
 
     def main(self):
         stdin = open("./input.txt", "r")
         test_case = int(stdin.readline())
 
         for _ in range(test_case):
+            self.graph = {}
+            self.num_of_cycle = 0
             self.length_of_seq = int(stdin.readline())
             self.sequence = list(map(int, stdin.readline().split()))
-            self.parent = [i for i in range(self.length_of_seq + 1)]
 
-            num_of_cycle = 0
+            self.visited = [False] * (self.length_of_seq + 1)
+            self.finished = [False] * (self.length_of_seq + 1)
+
+            for node in range(1, self.length_of_seq + 1):
+                self.graph[node] = []
+
             for node_1, node_2 in enumerate(self.sequence):
-                is_cycle = self.merge(node_1 + 1, node_2)
-                if is_cycle:
-                    num_of_cycle += 1
+                self.graph[node_1 + 1].append(node_2)
 
-            print(num_of_cycle)
+            for start_node in range(1, self.length_of_seq + 1):
+                if not self.visited[start_node]:
+                    self.dfs(start_node)
+
+            print(self.num_of_cycle)
 
 
 if __name__ == '__main__':
