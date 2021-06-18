@@ -1,37 +1,61 @@
 from sys import stdin
+from collections import deque
+
+moving_dir = [
+    [0, 1],
+    [0, -1],
+    [1, 0],
+    [-1, 0]
+]
 
 
-def main():
-    # 세로: n, 가로: m
-    n, m = map(int, stdin.readline().split())
-    canvas = [list(map(int, stdin.readline().split())) for _ in range(n)]
+class Main:
+    def __init__(self):
+        self.rows = 0
+        self.cols = 0
+        self.paint = None
+        self.visit = None
 
-    is_visited = [-1] * n
+        self.main()
 
-    answer = 0
-    # for i in range(n):
-    dfs(0, canvas, is_visited, answer)
+    def bfs(self, cur_row, cur_col):
+        queue = deque()
 
-    print(is_visited)
-    print(answer)
+        queue.append([cur_row, cur_col])
+        self.visit[cur_row][cur_col] = True
+
+        area = 1
+        while queue:
+            cur_row, cur_col = queue.popleft()
+
+            for moving_row, moving_col in moving_dir:
+                next_row = cur_row + moving_row
+                next_col = cur_col + moving_col
+                if 0 <= next_row < self.rows and 0 <= next_col < self.cols:
+                    if self.paint[next_row][next_col] == 1 and not self.visit[next_row][next_col]:
+                        area += 1
+                        queue.append([next_row, next_col])
+                        self.visit[next_row][next_col] = True
+
+        return area
+
+    def main(self):
+        stdin = open("./input.txt", "r")
+        self.rows, self.cols = map(int, stdin.readline().split())
+        self.paint = [list(map(int, stdin.readline().split())) for _ in range(self.rows)]
+        self.visit = [[False] * self.cols for _ in range(self.rows)]
+
+        num_of_area = 0
+        max_area = 0
+        for start_row in range(self.rows):
+            for start_col in range(self.cols):
+                if not self.visit[start_row][start_col] and self.paint[start_row][start_col] == 1:
+                    num_of_area += 1
+                    max_area = max(self.bfs(start_row, start_col), max_area)
+
+        print(num_of_area)
+        print(max_area)
 
 
-def dfs(start_point, matrix, is_visited, answer):
-    # 1. 체크인
-    is_visited[start_point] = 0
-    # 2. 목적지?
-    print(start_point)
-    answer += 1
-    # print(answer)
-    # 3. 갈 수 있는 곳 순회
-    for idx, next_point in enumerate(matrix[start_point]):
-        # 4. 갈 수 있는 곳 검사
-        if next_point == 1 and is_visited[idx] == -1:
-            dfs(idx, matrix, is_visited, answer)
-    # 5. 체크아웃
-    is_visited[start_point] = 1
-    answer -= 1
-
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    Main()
