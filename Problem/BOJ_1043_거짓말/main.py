@@ -1,49 +1,62 @@
 from sys import stdin
 
-def find(parents, person):
-    if parents[person] == person:
-        return person
-    parents[person] = find(parents, parents[person])
-    return parents[person]
 
-def merge(parents, truth_know_people, per1, per2):
-    per1_root = find(parents, per1)
-    per2_root = find(parents, per2)
-    if per1_root == per2_root:
-        return
+class Main:
+    def __init__(self):
+        self.num_of_people = 0
+        self.num_of_party = 0
+        self.knowing_people = None
+        self.parent = None
+        self.party = []
 
-    if per2_root in truth_know_people:
-        parents[per1_root] = per2_root
-    else:
-        parents[per2_root] = per1_root
+        self.main()
 
-def main():
-    stdin = open('./test_case.txt')
-    n, m = map(int, stdin.readline().split())
-    truth_know_people = list(map(int, stdin.readline().split()))[1:]
+    def find(self, person):
+        if self.parent[person] == person:
+            return person
+        self.parent[person] = self.find(self.parent[person])
+        return self.parent[person]
 
-    parents = [i for i in range(n + 1)]
+    def merge(self, person_1, person_2):
+        person_1_parent = self.find(person_1)
+        person_2_parent = self.find(person_2)
 
-    for _ in range(m):
-        participants = list(map(int, stdin.readline().split()))[1:]
+        if person_1_parent == person_2_parent:
+            return
+        self.parent[person_2_parent] = person_1_parent
 
-        for idx in range(len(participants) - 1):
-            merge(parents, truth_know_people, participants[idx], participants[idx + 1])
+    def main(self):
+        stdin = open("./input.txt", "r")
+        self.num_of_people, self.num_of_party = map(int, stdin.readline().split())
+        self.parent = [i for i in range(self.num_of_people + 1)]
 
-    # print(parents)
-    if len(truth_know_people) == 0:
-        print(m)
-    else:
-        answer = set()
-        for person in parents[1:]:
-            answer.add(find(parents, person))
+        knowing_people_info = list(map(int, stdin.readline().split()))
+        if knowing_people_info[0] != 0:
+            self.knowing_people = set(knowing_people_info[1:])
+        else:
+            self.knowing_people = set()
 
-        count = 0
-        for person in answer:
-            if person not in truth_know_people:
-                count += 1
-        print(count)
+        for _ in range(self.num_of_party):
+            cur_num_of_people, *cur_people = list(map(int, stdin.readline().split()))
+
+            self.party.append(cur_people)
+            for person_1, person_2 in zip(cur_people, cur_people[1:]):
+                if person_2 in self.knowing_people:
+                    self.merge(person_2, person_1)
+                else:
+                    self.merge(person_1, person_2)
+
+        num_of_party = 0
+        for cur_party in self.party:
+            for person in cur_party:
+                person_parent = self.find(person)
+                if person_parent in self.knowing_people:
+                    break
+            else:
+                num_of_party += 1
+
+        print(num_of_party)
 
 
 if __name__ == '__main__':
-    main()
+    Main()
