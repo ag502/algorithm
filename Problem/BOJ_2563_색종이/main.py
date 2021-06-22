@@ -4,52 +4,55 @@ from sys import stdin
 class Main:
     def __init__(self):
         self.rectangles = []
-        self.ret = 0
 
         self.main()
 
     def union_area(self):
-        if not self.rectangles:
-            return
-        events = []
         ys = set()
+        events = []
+        answer = 0
 
-        for idx, rectangle in enumerate(self.rectangles):
-            ys.add(rectangle["y1"])
-            ys.add(rectangle["y2"])
-            events.append((rectangle["x1"], (1, idx)))
-            events.append((rectangle["x2"], (-1, idx)))
+        for idx, rec in enumerate(self.rectangles):
+            ys.add(rec["y1"])
+            ys.add(rec["y2"])
+            events.append([rec["x1"], (1, idx)])
+            events.append([rec["x2"], (-1, idx)])
 
         ys = sorted(list(ys))
         events.sort()
 
-        count = [0] * (len(ys) - 1)
+        dup_count = [0] * (len(ys) - 1)
 
-        for idx, event in enumerate(events):
+        for i, event in enumerate(events):
             x, (delta, rec) = event
             y1 = self.rectangles[rec]["y1"]
             y2 = self.rectangles[rec]["y2"]
-            for i in range(len(ys)):
-                if y1 <= ys[i] < y2:
-                    count[i] += delta
+
+            for j, y in enumerate(ys):
+                if y1 <= y < y2:
+                    dup_count[j] += delta
 
             cut_length = 0
-            for i in range(len(count)):
-                if count[i] > 0:
-                    cut_length += ys[i + 1] - ys[i]
+            for j, dup in enumerate(dup_count):
+                if dup > 0:
+                    cut_length += ys[j + 1] - ys[j]
 
-            if idx + 1 < len(events):
-                self.ret += cut_length * ((events[idx + 1])[0] - x)
+            if i + 1 < len(events):
+                answer += cut_length * (events[i + 1][0] - events[i][0])
+
+        return answer
 
     def main(self):
         stdin = open("./input.txt", "r")
-        num_of_paper = int(stdin.readline())
-        for _ in range(num_of_paper):
-            vertical, cross = map(int, stdin.readline().split())
-            self.rectangles.append(({"x1": vertical, "x2": 10 + vertical, "y1": cross, "y2": 10 + cross}))
+        num_of_recs = int(stdin.readline())
 
-        self.union_area()
-        print(self.ret)
+        for _ in range(num_of_recs):
+            vertical, horizontal = map(int, stdin.readline().split())
+            self.rectangles.append(
+                {"x1": vertical, "x2": vertical + 10, "y1": horizontal, "y2": horizontal + 10}
+            )
+
+        print(self.union_area())
 
 
 if __name__ == '__main__':
