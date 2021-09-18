@@ -34,7 +34,8 @@ public class Main {
             if (standardDNACount.get(standardDNA[i]) == null) {
                 standardDNACount.put(standardDNA[i], 0);
             }
-            standardDNACount.put(standardDNA[i], Integer.parseInt(st.nextToken()));
+            // standardDNACount.put(standardDNA[i], Integer.parseInt(st.nextToken()));
+            standardDNACount.put(standardDNA[i], standardDNACount.getOrDefault(standardDNA[i], Integer.parseInt(st.nextToken())));
         }
 
         tempCount = new HashMap<String, Integer>() {{
