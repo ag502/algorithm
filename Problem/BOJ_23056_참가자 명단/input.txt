@@ -1,0 +1,9 @@
+4 2
+3 sunyoung
+2 junkyu
+2 dohyun
+1 minjun
+3 kihyun
+2 damin
+4 hyunsu
+0 0
