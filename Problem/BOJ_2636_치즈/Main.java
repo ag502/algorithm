@@ -9,74 +9,60 @@ class Position {
         this.row = row;
         this.col = col;
     }
-
-    @Override
-    public String toString() {
-        return "( " + this.row + ", " + this.col + " )";
-    }
 }
 
 public class Main {
     static int[][] checkFourDir = { { -1, 0 }, { 0, 1 }, { 1, 0 }, { 0, -1 } };
-    static int[][] checkEightDir = { { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 },
-            { -1, -1 }, { -1, 0 } };
     static int rows;
     static int cols;
-    static int sizeOfCheeze = 0;
     static int[][] cheeze;
+    static int sizeOfCheeze = 0;
+    static boolean[][] air;
     static boolean[][] visited;
 
     static StringTokenizer st;
 
-    public static boolean isPossible(int curRow, int curCol) {
-        for (int i = 0; i < checkFourDir.length; i++) {
-            int nextRow = curRow + checkFourDir[i][0];
-            int nextCol = curCol + checkFourDir[i][1];
-            if (0 <= nextRow && nextRow < rows && 0 <= nextCol && nextCol < cols) {
-                if (cheeze[nextRow][nextCol] == 3) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static void markAir(int curRow, int curCol) {
-        // 방문
-        cheeze[curRow][curCol] = 3;
-        // 가능한 곳 탐색
-        for (int i = 0; i < checkFourDir.length; i++) {
-            int nextRow = curRow + checkFourDir[i][0];
-            int nextCol = curCol + checkFourDir[i][1];
-            if (0 <= nextRow && nextRow < rows && 0 <= nextCol && nextCol < cols) {
-                if (cheeze[nextRow][nextCol] == 0 && isPossible(nextRow, nextCol)) {
-                    markAir(nextRow, nextCol);
-                }
-            }
-        }
-    }
-
-    public static List<Position> getExposurePos(int curRow, int curCol) {
-        List<Position> positions = new ArrayList<>();
+    public static void markAir() {
         Queue<Position> queue = new LinkedList<>();
+        visited = new boolean[rows][cols];
+        air = new boolean[rows][cols];
 
-        // 처음 위치 방문
-        queue.offer(new Position(curRow, curCol));
-        visited[curRow][curCol] = true;
+        queue.offer(new Position(0, 0));
+        visited[0][0] = true;
+        air[0][0] = true;
 
         while (queue.size() != 0) {
             Position curPos = queue.poll();
-            positions.add(new Position(curPos.row, curPos.col));
 
-            // 갈 수 있는 곳 확인
-            for (int i = 0; i < checkEightDir.length; i++) {
-                int nextRow = curPos.row + checkEightDir[i][0];
-                int nextCol = curPos.col + checkEightDir[i][1];
+            for (int i = 0; i < checkFourDir.length; i++) {
+                int nextRow = curPos.row + checkFourDir[i][0];
+                int nextCol = curPos.col + checkFourDir[i][1];
 
                 if (0 <= nextRow && nextRow < rows && 0 <= nextCol && nextCol < cols) {
-                    if (!visited[nextRow][nextCol] && isPossible(nextRow, nextCol) && cheeze[nextRow][nextCol] == 1) {
+                    if (!visited[nextRow][nextCol] && cheeze[nextRow][nextCol] == 0) {
                         queue.offer(new Position(nextRow, nextCol));
                         visited[nextRow][nextCol] = true;
+                        air[nextRow][nextCol] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    public static List<Position> getExposurePos() {
+        List<Position> positions = new ArrayList<>();
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (cheeze[row][col] == 1) {
+                    for (int i = 0; i < checkFourDir.length; i++) {
+                        int nextRow = row + checkFourDir[i][0];
+                        int nextCol = col + checkFourDir[i][1];
+                        if (0 <= nextRow && nextRow < rows && 0 <= nextCol && nextCol < cols
+                                && air[nextRow][nextCol] == true) {
+                            positions.add(new Position(row, col));
+                            break;
+                        }
                     }
                 }
             }
@@ -92,7 +78,7 @@ public class Main {
         rows = Integer.parseInt(st.nextToken());
         cols = Integer.parseInt(st.nextToken());
 
-        // 초기 cheeze 입력
+        // 치즈 입력 받기
         cheeze = new int[rows][cols];
         for (int row = 0; row < rows; row++) {
             st = new StringTokenizer(br.readLine());
@@ -100,49 +86,31 @@ public class Main {
                 int curValue = Integer.parseInt(st.nextToken());
                 cheeze[row][col] = curValue;
                 if (curValue == 1) {
-                    sizeOfCheeze++;
+                    sizeOfCheeze += 1;
                 }
             }
         }
 
-        cheeze[0][0] = 3;
-        int prevSize = 0;
         int time = 0;
+        int prevSize = 0;
+
         while (sizeOfCheeze > 0) {
             time++;
-            // 공기 부분 '3'으로 표시
-            for (int row = 0; row < rows; row++) {
-                for (int col = 0; col < cols; col++) {
-                    if (cheeze[row][col] == 0 && isPossible(row, col)) {
-                        markAir(row, col);
-                    }
-                }
+            // 공기 표시
+            markAir();
+            // 지워야하는 위치 가져오기
+            List<Position> positions = getExposurePos();
+
+            // 지우기
+            for (int i = 0; i < positions.size(); i++) {
+                Position curPos = positions.get(i);
+                cheeze[curPos.row][curPos.col] = 0;
             }
 
-            // 공기와 접촉된 부분 좌표 얻어오기
-            visited = new boolean[rows][cols];
-            List<List<Position>> positions = new ArrayList<>();
-            for (int row = 0; row < rows; row++) {
-                for (int col = 0; col < cols; col++) {
-                    if (!visited[row][col] && cheeze[row][col] == 1 && isPossible(row, col)) {
-                        positions.add(getExposurePos(row, col));
-                    }
-                }
-            }
-
-            if (positions.size() != 0) {
-                prevSize = sizeOfCheeze;
-                for (int i = 0; i < positions.size(); i++) {
-                    // System.out.println(positions.get(i).size());
-                    sizeOfCheeze -= positions.get(i).size();
-                    for (int j = 0; j < positions.get(i).size(); j++) {
-                        Position curPos = positions.get(i).get(j);
-                        cheeze[curPos.row][curPos.col] = 3;
-                    }
-
-                }
-            }
+            prevSize = sizeOfCheeze;
+            sizeOfCheeze -= positions.size();
         }
+
         System.out.println(time);
         System.out.println(prevSize);
     }
