@@ -1,61 +1,48 @@
 import java.util.*;
-import java.util.stream.*;
 import java.io.*;
 
 public class Main {
-    static List<Integer> password;
-    static int[] kindOfWords;
-
-    public static int descryption(int passwordIdx) {
-        if (passwordIdx < 0) {
-            return 1;
-        } else if (kindOfWords[passwordIdx] != 0) {
-            return kindOfWords[passwordIdx];
-        }
-
-        int answer = 0;
-        answer += descryption(passwordIdx - 1) % 1000000;
-
-        int word = password.get(passwordIdx - 1) * 10 + password.get(passwordIdx);
-        if (word <= 26) {
-            answer += descryption(passwordIdx - 2) % 1000000;
-        }
-        kindOfWords[passwordIdx] = answer;
-        return answer;
-    }
-
     public static void main(String[] args) throws IOException {
         System.setIn(new FileInputStream("Problem\\BOJ_2011_암호코드\\input.txt"));
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        // 암호 입력받기
-        password = Arrays.stream(br.readLine().split("")).map(el -> Integer.parseInt(el)).collect(Collectors.toList());
+        // 비밀번호 입력받기
+        String password = br.readLine();
+        int[] passwordAsInt = new int[password.length()];
+        for (int i = 0; i < password.length(); i++) {
+            passwordAsInt[i] = password.charAt(i) - '0';
+        }
 
-        // dp 배열 초기화
-        kindOfWords = new int[password.size()];
-        kindOfWords[0] = 1;
-
-        if (password.get(0) == 0) {
+        // dp 배열
+        int[] dp = new int[password.length()];
+        if (passwordAsInt[0] == 0) {
             System.out.println(0);
             return;
+        } else {
+            dp[0] = 1;
         }
 
-        for (int i = 1; i < kindOfWords.length; i++) {
-            if (password.get(i) != 0) {
-                kindOfWords[i] += kindOfWords[i - 1];
+        for (int i = 1; i < passwordAsInt.length; i++) {
+            // 한 글자 확인
+            if (passwordAsInt[i] != 0) {
+                dp[i] = (dp[i] + dp[i - 1]) % 1000000;
             }
-            if (i >= 1) {
-                int curWord = password.get(i - 1) * 10 + password.get(i);
-                if (0 < curWord && curWord <= 26) {
-                    if (i < 2) {
-                        kindOfWords[i] += 1;
-                    } else {
-                        kindOfWords[i] += kindOfWords[i - 2];
-                    }
+
+            if (passwordAsInt[i - 1] != 0 && (passwordAsInt[i - 1] * 10 + passwordAsInt[i] <= 26)) {
+                if (i == 1) {
+                    dp[i] = (dp[i] + 1) % 1000000;
+                } else {
+                    dp[i] = (dp[i] + dp[i - 2]) % 1000000;
                 }
             }
+
+            if (dp[i] == 0) {
+                System.out.println(0);
+                return;
+            }
         }
-        System.out.println(Arrays.toString(kindOfWords));
-        System.out.println(kindOfWords[password.size() - 1]);
+
+        // System.out.println(Arrays.toString(dp));
+        System.out.println(dp[password.length() - 1]);
     }
 }
