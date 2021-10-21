@@ -12,62 +12,119 @@ class Position {
 
     @Override
     public String toString() {
-        return this.row + "/" + this.col;
+        return this.row + " / " + this.col;
     }
 }
 
-public class Main {
+class PriorityNode implements Comparable<PriorityNode> {
+    int dist;
+    int departRow, departCol, arrivalRow, arrivalCol, posIdx;
+
+    public PriorityNode(int dist, int departRow, int departCol, int arrivalRow, int arrivalCol, int posIdx) {
+        this.dist = dist;
+        this.departRow = departRow;
+        this.departCol = departCol;
+        this.arrivalRow = arrivalRow;
+        this.arrivalCol = arrivalCol;
+        this.posIdx = posIdx;
+    }
+
+    @Override
+    public int compareTo(PriorityNode p1) {
+        if (this.dist == p1.dist) {
+            if (this.departRow == p1.departRow) {
+                return this.departCol - p1.departCol;
+            }
+            return this.departRow - p1.departRow;
+        }
+        return this.dist - p1.dist;
+    }
+
+    @Override
+    public String toString() {
+        return this.dist + " " + this.departRow + " " + this.departCol;
+    }
+}
+
+class Main {
     static int[][] movingDir = { { -1, 0 }, { 0, 1 }, { 1, 0 }, { 0, -1 } };
     static int sizeOfWorld, numOfPassengers, fuel;
     static int[][] world;
+    static Position taxiPosition;
     static Position[] departPositions;
-    static Position[] arrivePositions;
-    static Position curTaxiPosition;
-    static PriorityQueue<int[]> pq;
-    static int minDist = Integer.MAX_VALUE;
+    static Position[] arrivalPositions;
+    static int[][] dist;
 
     static StringTokenizer st;
 
-    public static int getMinDist(int startRow, int startCol, int endRow, int endCol) {
-        Deque<Position> queue = new ArrayDeque<>();
+    public static void getMinDistToPassengers() {
+        Queue<Position> queue = new LinkedList<>();
         boolean[][] visited = new boolean[sizeOfWorld + 1][sizeOfWorld + 1];
+
+        // dist 초기화
+        dist = new int[sizeOfWorld + 1][sizeOfWorld + 1];
+        for (int row = 1; row <= sizeOfWorld; row++) {
+            for (int col = 1; col <= sizeOfWorld; col++) {
+                dist[row][col] = Integer.MAX_VALUE;
+            }
+        }
+        queue.add(taxiPosition);
+        visited[taxiPosition.row][taxiPosition.col] = true;
+        dist[taxiPosition.row][taxiPosition.col] = 0;
+
+        while (!queue.isEmpty()) {
+            Position curPos = queue.poll();
+
+            for (int i = 0; i < movingDir.length; i++) {
+                int nextRow = curPos.row + movingDir[i][0];
+                int nextCol = curPos.col + movingDir[i][1];
+
+                if (1 <= nextRow && nextRow <= sizeOfWorld && 1 <= nextCol && nextCol <= sizeOfWorld) {
+                    if (!visited[nextRow][nextCol] && world[nextRow][nextCol] == 0) {
+                        queue.add(new Position(nextRow, nextCol));
+                        visited[nextRow][nextCol] = true;
+                        dist[nextRow][nextCol] = dist[curPos.row][curPos.col] + 1;
+                    }
+                }
+            }
+        }
+    }
+
+    public static void getPassengerToArrival(int startRow, int startCol, int finishRow, int finishCol) {
+        Queue<Position> queue = new LinkedList<>();
+        boolean[][] visited = new boolean[sizeOfWorld + 1][sizeOfWorld + 1];
+
+        // dist 초기화
+        for (int row = 1; row <= sizeOfWorld; row++) {
+            for (int col = 1; col <= sizeOfWorld; col++) {
+                dist[row][col] = Integer.MAX_VALUE;
+            }
+        }
+        dist[startRow][startCol] = 0;
 
         queue.add(new Position(startRow, startCol));
         visited[startRow][startCol] = true;
 
-        int dist = 0;
         while (!queue.isEmpty()) {
-            int curSize = queue.size();
+            Position curPos = queue.poll();
 
-            dist += 1;
-            for (int size = 0; size < curSize; size++) {
-                Position curPos = queue.poll();
-
-                if (dist > minDist) {
-                    return Integer.MAX_VALUE;
-                }
-
-                if (curPos.row == endRow && curPos.col == endCol) {
-                    return dist - 1;
-                }
-
-                for (int i = 0; i < movingDir.length; i++) {
-                    int nextRow = curPos.row + movingDir[i][0];
-                    int nextCol = curPos.col + movingDir[i][1];
-
-                    if (1 <= nextRow && nextRow <= sizeOfWorld && 1 <= nextCol && nextCol <= sizeOfWorld) {
-                        if (!visited[nextRow][nextCol] && world[nextRow][nextCol] == 0) {
-                            visited[nextRow][nextCol] = true;
-                            queue.add(new Position(nextRow, nextCol));
-                        }
-                    }
-                }
-
+            if (curPos.row == finishRow && curPos.col == finishCol) {
+                return;
             }
 
-        }
+            for (int i = 0; i < movingDir.length; i++) {
+                int nextRow = curPos.row + movingDir[i][0];
+                int nextCol = curPos.col + movingDir[i][1];
 
-        return Integer.MAX_VALUE;
+                if (1 <= nextRow && nextRow <= sizeOfWorld && 1 <= nextCol && nextCol <= sizeOfWorld) {
+                    if (!visited[nextRow][nextCol] && world[nextRow][nextCol] == 0) {
+                        queue.add(new Position(nextRow, nextCol));
+                        visited[nextRow][nextCol] = true;
+                        dist[nextRow][nextCol] = dist[curPos.row][curPos.col] + 1;
+                    }
+                }
+            }
+        }
     }
 
     public static void main(String[] args) throws IOException {
@@ -89,101 +146,70 @@ public class Main {
             }
         }
 
-        // 초기 택시 위치 초기화
+        // 현재 택시 위치 초기화
         st = new StringTokenizer(br.readLine());
         int curTaxiRow = Integer.parseInt(st.nextToken());
         int curTaxiCol = Integer.parseInt(st.nextToken());
-        curTaxiPosition = new Position(curTaxiRow, curTaxiCol);
+        taxiPosition = new Position(curTaxiRow, curTaxiCol);
 
-        // 승객 출발 탑승 위치, 완료 여부 배열 초기화
-        Set<Integer> passengers = new HashSet<>();
-        for (int i = 1; i <= numOfPassengers; i++) {
-            passengers.add(i);
-        }
+        // 출발지 도착지 위치 초기화
         departPositions = new Position[numOfPassengers + 1];
-        arrivePositions = new Position[numOfPassengers + 1];
+        arrivalPositions = new Position[numOfPassengers + 1];
+        Set<Integer> positionList = new HashSet<>();
 
         for (int i = 1; i <= numOfPassengers; i++) {
             st = new StringTokenizer(br.readLine());
-            departPositions[i] = new Position(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
-            arrivePositions[i] = new Position(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+            int departRow = Integer.parseInt(st.nextToken());
+            int departCol = Integer.parseInt(st.nextToken());
+            int arrivalRow = Integer.parseInt(st.nextToken());
+            int arrivalCol = Integer.parseInt(st.nextToken());
+
+            departPositions[i] = new Position(departRow, departCol);
+            arrivalPositions[i] = new Position(arrivalRow, arrivalCol);
+            positionList.add(i);
         }
 
-        pq = new PriorityQueue<>(new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                if (o1[0] == o2[0]) {
-                    if (o1[1] == o2[1]) {
-                        return o1[2] - o2[2];
-                    }
-                    return o1[1] - o2[1];
-                }
-                return o1[0] - o2[0];
-            }
-        });
         int count = numOfPassengers;
         while (count > 0) {
-            pq.clear();
-            // 각각의 출발지에서 현재 택시 까지의 최소 거리
-            for (int idx : passengers) {
-                Position curDepartPos = departPositions[idx];
-                int distToTaxi = getMinDist(curDepartPos.row, curDepartPos.col, curTaxiPosition.row,
-                        curTaxiPosition.col);
-
-                if (distToTaxi != Integer.MAX_VALUE) {
-                    if (distToTaxi < minDist) {
-                        minDist = distToTaxi;
-                        pq.clear();
-                        pq.add(new int[] { distToTaxi, departPositions[idx].row, departPositions[idx].col,
-                                arrivePositions[idx].row, arrivePositions[idx].col, idx });
-                    } else if (distToTaxi == minDist) {
-                        pq.add(new int[] { distToTaxi, departPositions[idx].row, departPositions[idx].col,
-                                arrivePositions[idx].row, arrivePositions[idx].col, idx });
-                    }
-                }
-
-                // pq.add(new int[] { distToTaxi, departPositions[idx].row,
-                // departPositions[idx].col,
-                // arrivePositions[idx].row, arrivePositions[idx].col, idx });
-
+            // 우선 순위 큐
+            PriorityQueue<PriorityNode> pq = new PriorityQueue<>();
+            // 택시에서 목적지까지 최단거리 계산
+            getMinDistToPassengers();
+            for (int posIdx : positionList) {
+                Position curDepartPos = departPositions[posIdx];
+                Position curArrivalPos = arrivalPositions[posIdx];
+                int curDist = dist[curDepartPos.row][curDepartPos.col];
+                pq.add(new PriorityNode(curDist, curDepartPos.row, curDepartPos.col, curArrivalPos.row,
+                        curArrivalPos.col, posIdx));
             }
 
-            // 탑승 위치
-            int[] curDepartPos = pq.poll();
-            System.out.println(Arrays.toString(curDepartPos));
-            int distToTaxi = curDepartPos[0];
-            int departRow = curDepartPos[1];
-            int departCol = curDepartPos[2];
-
-            // 연료가 부족하면 불가능
-            if (fuel < distToTaxi || distToTaxi == Integer.MAX_VALUE) {
+            PriorityNode curInfo = pq.poll();
+            // 연료 부족으로 승객이 있는 곳으로 가지 못함
+            if (fuel < curInfo.dist) {
                 System.out.println(-1);
                 return;
             }
-            // 탑승위치까지 택시이동
-            fuel -= distToTaxi;
-            curTaxiPosition.row = departRow;
-            curTaxiPosition.col = departCol;
 
-            // 탑승위치에서 도착지까지 이동
-            int arriveRow = curDepartPos[3];
-            int arriveCol = curDepartPos[4];
-            minDist = Integer.MAX_VALUE;
-            int dist = getMinDist(curTaxiPosition.row, curTaxiPosition.col, arriveRow, arriveCol);
-            System.out.println(dist);
-            // 가능 도중 연료가 부족하면 불가능
-            if (fuel < dist || dist == Integer.MAX_VALUE) {
-                System.out.println("a");
+            // 승객이 있는 곳으로 이동한 다면 연료 감소, 택시 위치 변경
+            fuel -= curInfo.dist;
+            taxiPosition.row = curInfo.departRow;
+            taxiPosition.col = curInfo.departCol;
 
+            // 출발지에서 목적지까지 최단 거리 계산
+            getPassengerToArrival(curInfo.departRow, curInfo.departCol, curInfo.arrivalRow, curInfo.arrivalCol);
+
+            // 연료 부족으로 목적지까지 가지 못함
+            int curDist = dist[curInfo.arrivalRow][curInfo.arrivalCol];
+            if (fuel < curDist) {
                 System.out.println(-1);
                 return;
             }
-            // 도착
-            fuel -= dist;
-            fuel += dist * 2;
-            curTaxiPosition.row = arriveRow;
-            curTaxiPosition.col = arriveCol;
-            passengers.remove(curDepartPos[5]);
+
+            // 목적지까지 이동할 수 있으면 연료 재지정 및 택시 위치 변경
+            fuel = fuel - curDist + (curDist * 2);
+            taxiPosition.row = curInfo.arrivalRow;
+            taxiPosition.col = curInfo.arrivalCol;
+            positionList.remove(curInfo.posIdx);
             count -= 1;
         }
 
